@@ -1,53 +1,80 @@
 # Written by Tomas Dudacek in project /mushra_py_ctu
+# import logging
+# logger = logging.getLogger(__name__)
+
 
 import requests
-import logging
-logger = logging.getLogger(__name__)
+
+class ReaperError(RuntimeError):
+    pass
 
 class Player:
-    """ Class implementing communication with REAPER DAW """
+    """ Class implementing communication with REAPER DAW over http """
 
     def __init__(self):
-        self.BASE_ADD = 'http://127.0.0.1:8080/_/'
+        self.BASE_ADD = "http://127.0.0.1:8080/_/"
         
-        if not self.check_server():
-            logger.error("REAPER does not respond to call!")
-            raise
-        
-        self.n_tracks = self.set_n_tracks()
-        self.go_to_begining()
-        self.unsolo_all()
+        self.check_server()
+        self.n_tracks = self.get_n_tracks()
+        self.command(
+            self.Stop,
+            self.Go_to_beginning,
+            self.Unmute_all,
+            self.Unsolo_all,
+        )
 
-    def check_server(self) -> bool:
-        return requests.get(self.BASE_ADD).ok
+    def check_server(self):
+        try:
+            resp = requests.get(self.BASE_ADD)
+        except:
+            raise ReaperError("Failed to check the server!")
+        if not resp.ok:
+            raise ReaperError(f"Server not ok, responded with code {resp.status_code}")
 
-    def set_n_tracks(self) -> int:
-        resp = requests.get(self.BASE_ADD + 'NTRACK')
-        print(resp.text)
+    def get_n_tracks(self) -> int:
+        try:
+            resp = requests.get(self.BASE_ADD + 'NTRACK')
+        except:
+            raise ReaperError("Failed to fetch the number of tracks!")
+        if not resp.ok:
+            return None
         return int(resp.text.split('\t')[1].strip('\n'))
 
-    def go_to_begining(self) -> None:
-        requests.get(self.BASE_ADD + 'SET/POS/0')
+    def command(self, *commands):
+        """ Sends one or multiple commands to Reaper. Commands are strings separated with ';'. """
+        try:
+            resp = requests.get(self.BASE_ADD + ';'.join(commands))
+        except:
+            raise ReaperError(f'Failed to send commands "{commands}"!')
+        return resp.ok
 
-    def go_to_time(self, time : float) -> None:
-        requests.get(self.BASE_ADD + 'SET/POS/' + str(time))
+    """" Basic commands """
+    Go_to_beginning = "SET/POS/0"
+    def Go_to_time(self, time): return f"SET/POS/{time}"
 
-    def solo_track(self,track_n : int) -> None:
-        requests.get(self.BASE_ADD + 'SET/TRACK/'+str(track_n)+'/SOLO/1')
+    def Solo_track(self, track): return f"SET/TRACK/{track}/SOLO/1"
+    def Unsolo_track(self, track): return f"SET/TRACK/{track}/SOLO/0"
+    def Solo_toggle(self, track): return f"SET/TRACK/{track}/SOLO/-1"
+    @property
+    def Solo_all(self): return ';'.join([self.Solo_track(i) for i in range(1, self.n_tracks+1)])
+    @property
+    def Unsolo_all(self): return ';'.join([self.Unsolo_track(i) for i in range(1, self.n_tracks+1)])
 
-    def unsolo_track(self,track_n : int) -> None:
-        requests.get(self.BASE_ADD + 'SET/TRACK/'+str(track_n)+'/SOLO/0')
+    def Mute_track(self, track): return f"SET/TRACK/{track}/MUTE/1"
+    def Unmute_track(self, track): return f"SET/TRACK/{track}/MUTE/0"
+    def Mute_toggle(self, track): return f"SET/TRACK/{track}/MUTE/-1"
+    @property
+    def Mute_all(self): return ';'.join([self.Mute_track(i) for i in range(1, self.n_tracks+1)])
+    @property
+    def Unmute_all(self): return ';'.join([self.Unmute_track(i) for i in range(1, self.n_tracks+1)])
 
-    def play(self) -> None:
-        requests.get(self.BASE_ADD + '1007')
+    Play = "1007"
+    Pause = "1008"
+    Stop = "1016"
 
-    def next_frame(self) -> None:
-        requests.get(self.BASE_ADD + '40173')
+    Next_marker = "40173"
+    Prev_marker = "40172"
 
-    def prev_frame(self) -> None:
-        requests.get(self.BASE_ADD + '40172')
-
-    def unsolo_all(self) -> None:
-        for i in range(self.n_tracks):
-            self.unsolo_track(i)
+if __name__ == "__main__":
+    player = Player()
 
