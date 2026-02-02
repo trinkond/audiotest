@@ -13,40 +13,31 @@ class ReaperAPI:
 
     def __init__(self):
         self.BASE_ADD = "http://127.0.0.1:8080/_/"
-        
         self.check_server()
         self.n_tracks = self.get_n_tracks()
-        self.command(
-            self.Stop,
-            self.Go_to_beginning,
-            self.Unmute_all,
-            self.Unsolo_all,
-        )
 
     def check_server(self):
-        try:
-            resp = requests.get(self.BASE_ADD)
-        except:
-            raise ReaperError("Failed to check the server!")
+        resp = requests.get(self.BASE_ADD)
         if not resp.ok:
             raise ReaperError(f"Server not ok, responded with code {resp.status_code}")
 
     def get_n_tracks(self) -> int:
-        try:
-            resp = requests.get(self.BASE_ADD + 'NTRACK')
-        except:
-            raise ReaperError("Failed to fetch the number of tracks!")
+        resp = requests.get(self.BASE_ADD + 'NTRACK')
         if not resp.ok:
-            return None
-        return int(resp.text.split('\t')[1].strip('\n'))
+            raise ReaperError(f"Failed to fetch number of tracks, server responded with code {resp.status_code}")
+        try:
+            n = int(resp.text.split('\t')[1].strip('\n'))
+        except (IndexError, ValueError) as e:
+            raise ReaperError(f'Failed to fetch number of tracks, server message "{resp.text}"') from e
+        if n < 0:
+            raise ReaperError(f'Failed to fetch number of tracks, {n} is invalid')
+        return n 
 
     def command(self, *commands):
         """ Sends one or multiple commands to Reaper. Commands are strings separated with ';'. """
-        try:
-            resp = requests.get(self.BASE_ADD + ';'.join(commands))
-        except:
-            raise ReaperError(f'Failed to send commands "{commands}"!')
-        return resp.ok
+        resp = requests.get(self.BASE_ADD + ';'.join(commands))
+        if not resp.ok:
+            raise ReaperError(f'Failed to send commands "{commands}", server responded with code {resp.status_code}')
 
     """" Basic commands """
     Go_to_beginning = "SET/POS/0"
@@ -75,8 +66,37 @@ class ReaperAPI:
     Next_marker = "40173"
     Prev_marker = "40172"
 
+
 class Player:
-    pass
+    """ Audio player interface for playing tracks through Reaper """
+
+    def __init__(self):
+
+        self.reaper = None
+       
+
+
+    
+    def __enter__(self):
+        self.reaper = ReaperAPI()
+        self.n_tracks = self.reaper.n_tracks
+        self.reaper.command(
+            self.Stop,
+            self.Go_to_beginning,
+            self.Unmute_all,
+            self.Unsolo_all,
+        )
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return False
+
+    def play(self):
+        pass
+
+
+    def stop(self):
+        pass
+
 
 
 
@@ -85,13 +105,6 @@ class Player:
 if __name__ == "__main__":
     player = Player()
 
-    from pycaw.pycaw import AudioUtilities
-
-    device = AudioUtilities.GetSpeakers()
-    volume = device.EndpointVolume
-
-    print(volume.GetMasterVolumeLevelScalar())  # 0.0–1.0
-    volume.SetMasterVolumeLevelScalar(0.72, None)  # set to 50%
 
 
 ## Chat generated example to unmute only Reaper
