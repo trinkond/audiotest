@@ -1,11 +1,20 @@
-# Written by Tomas Dudacek in project /mushra_py_ctu
+# Inspired by Tomas Dudacek in project /mushra_py_ctu
+# Written by Ondrej Trinkewitz
 # import logging
 # logger = logging.getLogger(__name__)
 
 
 import requests
+import time
+from Regions import Region
 
 class ReaperError(RuntimeError):
+    pass
+
+class PlaybackError(Exception):
+    pass
+
+class PlayerNotActiveError(Exception):
     pass
 
 class ReaperAPI:
@@ -66,47 +75,84 @@ class ReaperAPI:
     Next_marker = "40173"
     Prev_marker = "40172"
 
-
 class Player:
-    """ Audio player interface for playing tracks through Reaper """
+    """ Audio player interface for playing tracks using Reaper """
 
-    def __init__(self):
-
+    def __init__(self, regions : dict[Region]):
         self.reaper = None
-       
+        self.regions = regions
+        self.track = 0
+        self.region = 0
+        self.playback_started = 0.0
+        self.playback_stopped = False
+        self.REAPER_DELAY = 0.2  # safety time delay for reaper connection
 
-
-    
-    def __enter__(self):
+    def activate(self):
         self.reaper = ReaperAPI()
-        self.n_tracks = self.reaper.n_tracks
         self.reaper.command(
-            self.Stop,
-            self.Go_to_beginning,
-            self.Unmute_all,
-            self.Unsolo_all,
+            self.reaper.Stop,
+            self.reaper.Go_to_beginning,
+            self.reaper.Unmute_all,
+            self.reaper.Unsolo_all,
         )
 
+    def __enter__(self):
+        self.activate()
+        return self
+
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.reaper = None
         return False
 
-    def play(self):
-        pass
-
+    def playTrack(self, track : int, region : int):
+        if self.reaper is None:
+            raise PlayerNotActiveError("Cannot play track, Player isn't activated")
+        if not track in range(1, self.reaper.n_tracks+1):
+            raise PlaybackError(f"There is no track with number {track}")
+        if not region in self.regions:
+            raise PlaybackError(f"There is no region with ID {region}")
+        self.reaper.command(
+            self.reaper.Unmute_all,
+            self.reaper.Unsolo_all,
+            self.reaper.Solo_track(track),
+            self.reaper.Go_to_time(self.regions[region].start_time),
+            self.reaper.Play,
+            )
+        self.playback_started = time.perf_counter()
+        self.playback_stopped = False
+        self.region = region
+        self.track = track
 
     def stop(self):
-        pass
+        if self.reaper is None:
+            raise PlayerNotActiveError("Cannot control playback, Player isn't activated")
+        self.reaper.command(self.reaper.Stop)
+        self.playback_stopped = True
 
-
-
-
-
+    def playing(self) -> bool:
+        if self.reaper is None:
+            return False
+        if self.playback_stopped:
+            return False
+        playback_end = self.playback_started + self.regions[self.region].duration
+        playback_end += self.REAPER_DELAY
+        if time.perf_counter() > playback_end:
+            return False
+        return True
 
 if __name__ == "__main__":
-    player = Player()
+    from Regions import RegionReader
+    reader = RegionReader("sample_regions.csv", 4)
+    cfg = reader.read_config()
+    player = Player(cfg)
+    player.activate()
+    player.playTrack(2, 3)
+    while(player.playing()):
+        print("p", end="")
 
 
 
+def ignored():
 ## Chat generated example to unmute only Reaper
     from audiomath.SystemVolume import SystemVolumeSetting, MAX_VOLUME
 
