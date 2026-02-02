@@ -1,0 +1,11 @@
+For audio level
+audiomath
+- cross platform
+- scale 0.0-1.0
+- no advanced control (system volume mixer)
+- usable for calibration
+
+To test the packages for plain python installation,
+I use conda enviroment "audiotest" with system packages turned off.
+Every package i install there gets listed in dependencies.
+

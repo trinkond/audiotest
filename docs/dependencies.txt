@@ -1,0 +1,4 @@
+
+Python packages
+requests - for http communication with Reaper
+audiomath - messing with system volume

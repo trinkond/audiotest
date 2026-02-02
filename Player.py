@@ -8,7 +8,7 @@ import requests
 class ReaperError(RuntimeError):
     pass
 
-class Player:
+class ReaperAPI:
     """ Class implementing communication with REAPER DAW over http """
 
     def __init__(self):
@@ -75,6 +75,41 @@ class Player:
     Next_marker = "40173"
     Prev_marker = "40172"
 
+class Player:
+    pass
+
+
+
+
+
 if __name__ == "__main__":
     player = Player()
 
+    from pycaw.pycaw import AudioUtilities
+
+    device = AudioUtilities.GetSpeakers()
+    volume = device.EndpointVolume
+
+    print(volume.GetMasterVolumeLevelScalar())  # 0.0–1.0
+    volume.SetMasterVolumeLevelScalar(0.72, None)  # set to 50%
+
+
+## Chat generated example to unmute only Reaper
+    from audiomath.SystemVolume import SystemVolumeSetting, MAX_VOLUME
+
+    # Your desired master volume (0.0–1.0)
+    DESIRED_VOLUME = 0.5
+
+    # Step 1: Set master volume
+    MASTER_VOL = SystemVolumeSetting(level=DESIRED_VOLUME, mute=False)
+
+    # Step 2: Mute all sessions (except Reaper)
+    MUTE_ALL = SystemVolumeSetting(mute=True, session=None)  # session=None mutes all apps
+
+    # Step 3: Unmute Reaper
+    REAPER_UNMUTE = SystemVolumeSetting(mute=False, session="Reaper")
+
+    # Combine settings: master volume + mute all + unmute Reaper
+    with MASTER_VOL & MUTE_ALL & REAPER_UNMUTE:
+        print("Volume set. Everything muted except Reaper.")
+        input("Press Enter to restore original system settings...")

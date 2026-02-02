@@ -1,0 +1,18 @@
+How smart markers work
+-----------------------
+SWS must be installed and marker actions enabled
+
+Create a marker and into name field put !##### (exclamation mark and a number - ID)
+When reaching this marker, Reaper will execute the command with that ID
+IDs of commands are listed here https://stash.reaper.fm/oldsb/50478/REAPER_Main-Window_command-identifiers.txt
+
+Notes:
+It is possible to run multiple commands by chaining them and separating with space. Only one exclamation mark is used.
+If a region is named like this, the action runs on the region start. Not mentioned anywhere - unsafe
+
+Examples:
+!1008
+pauses the playback
+!40172 16
+Moves play cursor to previous marker (without stopping playback).
+Toggles on and off the FX bypass for the master track.
