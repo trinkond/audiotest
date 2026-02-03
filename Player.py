@@ -6,15 +6,13 @@
 
 import requests
 import time
+from audiomath import SystemVolume
 from Regions import Region
 
 class ReaperError(RuntimeError):
     pass
 
 class PlaybackError(Exception):
-    pass
-
-class PlayerNotActiveError(Exception):
     pass
 
 class ReaperAPI:
@@ -78,17 +76,17 @@ class ReaperAPI:
 class Player:
     """ Audio player interface for playing tracks using Reaper """
 
-    def __init__(self, regions : dict[Region]):
-        self.reaper = None
+    def __init__(self, regions : dict[Region], volume : float = 1.0):
         self.regions = regions
         self.track = 0
         self.region = 0
         self.playback_started = 0.0
         self.playback_stopped = False
+        self.volume = volume
         self.REAPER_DELAY = 0.2  # safety time delay for reaper connection
 
-    def activate(self):
         self.reaper = ReaperAPI()
+        self.setVolume(self.volume)
         self.reaper.command(
             self.reaper.Stop,
             self.reaper.Go_to_beginning,
@@ -96,21 +94,12 @@ class Player:
             self.reaper.Unsolo_all,
         )
 
-    def __enter__(self):
-        self.activate()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.reaper = None
-        return False
-
     def playTrack(self, track : int, region : int):
-        if self.reaper is None:
-            raise PlayerNotActiveError("Cannot play track, Player isn't activated")
         if not track in range(1, self.reaper.n_tracks+1):
             raise PlaybackError(f"There is no track with number {track}")
         if not region in self.regions:
             raise PlaybackError(f"There is no region with ID {region}")
+        self.setVolume(self.volume)
         self.reaper.command(
             self.reaper.Unmute_all,
             self.reaper.Unsolo_all,
@@ -124,14 +113,10 @@ class Player:
         self.track = track
 
     def stop(self):
-        if self.reaper is None:
-            raise PlayerNotActiveError("Cannot control playback, Player isn't activated")
         self.reaper.command(self.reaper.Stop)
         self.playback_stopped = True
 
     def playing(self) -> bool:
-        if self.reaper is None:
-            return False
         if self.playback_stopped:
             return False
         playback_end = self.playback_started + self.regions[self.region].duration
@@ -140,35 +125,16 @@ class Player:
             return False
         return True
 
+    def setVolume(self, volume : float):
+        self.volume = volume
+        SystemVolume.SetVolume(level=self.volume, mute=False)
+
 if __name__ == "__main__":
     from Regions import RegionReader
     reader = RegionReader("sample_regions.csv", 4)
     cfg = reader.read_config()
     player = Player(cfg)
-    player.activate()
     player.playTrack(2, 3)
     while(player.playing()):
         print("p", end="")
 
-
-
-def ignored():
-## Chat generated example to unmute only Reaper
-    from audiomath.SystemVolume import SystemVolumeSetting, MAX_VOLUME
-
-    # Your desired master volume (0.0–1.0)
-    DESIRED_VOLUME = 0.5
-
-    # Step 1: Set master volume
-    MASTER_VOL = SystemVolumeSetting(level=DESIRED_VOLUME, mute=False)
-
-    # Step 2: Mute all sessions (except Reaper)
-    MUTE_ALL = SystemVolumeSetting(mute=True, session=None)  # session=None mutes all apps
-
-    # Step 3: Unmute Reaper
-    REAPER_UNMUTE = SystemVolumeSetting(mute=False, session="Reaper")
-
-    # Combine settings: master volume + mute all + unmute Reaper
-    with MASTER_VOL & MUTE_ALL & REAPER_UNMUTE:
-        print("Volume set. Everything muted except Reaper.")
-        input("Press Enter to restore original system settings...")
