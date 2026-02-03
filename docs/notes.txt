@@ -9,3 +9,10 @@ To test the packages for plain python installation,
 I use conda enviroment "audiotest" with system packages turned off.
 Every package i install there gets listed in dependencies.
 
+In Player.py, there is the reaper interface and the controller Player class
+Player simple audio player interface
+For initialization, it takes dict[Region] to know, what times the regions are in
+PlayTrack(track, region) - plays the desired region of the desired track
+stop() - stops the playback immediately
+setVolume(volume) - set the player volume (also can be passed to the constructor)
+playing() - returns if the track is still playing or ended
