@@ -2,6 +2,7 @@
 Python packages
 requests - for http communication with Reaper
 audiomath - messing with system volume
+PyQt6 - nice user intefrace
 
 Reaper
 SWS extension - https://www.sws-extension.org/

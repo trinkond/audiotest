@@ -1,0 +1,32 @@
+Preparing the recordings for the player
+For reaper version 7.59
+
+1. Load all the samples into the first track
+2. Route the first track to all other tracks
+   If route button isn't present, it can be enabled by selecting
+   Track > Track Layout > Track Pnel > B
+3. Add desired effects to your tracks except for the first one
+4. Mark playback regions
+   Select the part that you want to play with the time cursor and do
+   Insert > Region (from time selection) Shift+R
+   To select exactly the recorded item, do
+   Actions > Show action list... > Time selection: Set time selection to items
+5. Add stop marker at the end of each region
+   Select the region with the time cursor
+   You may already have it selected from the previous step
+   If not, double click the region
+   Insert > Marker (prompt for name) Shift+M
+   Name the marker !1008 (important)
+6. Test the markers
+   Start the playback. It should stop as soon as it hits the marker.
+   If not, check if smart marker actions are enabled
+   Extensions > SWS/S&M > SWS Options > Enable marker actions
+7. Export the regions
+   Check if timestamps are set to seconds
+   Right click the top ruler > Minutes:Seconds
+   View > Region/Marker Manager Ctrl+Alt+Shift+R
+   Check if Regions mark at the bottom is checked
+   Optionally uncheck Markers, since they aren't needed for the player
+   Optons > Export regions/markers...
+   Choose a filename .csv and export
+8. Save the project and you are good to go

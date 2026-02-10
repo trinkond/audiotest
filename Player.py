@@ -1,12 +1,14 @@
 # Inspired by Tomas Dudacek in project /mushra_py_ctu
 # Written by Ondrej Trinkewitz
-# import logging
-# logger = logging.getLogger(__name__)
 
 import requests
 import time
+import logging
 from audiomath import SystemVolume
 from Regions import Region
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class ReaperError(RuntimeError):
     pass
@@ -130,10 +132,11 @@ class Player:
 
 if __name__ == "__main__":
     from Regions import RegionReader
-    reader = RegionReader("sample_regions.csv", 4)
+    reader = RegionReader(input("Enter region file name: "))
     cfg = reader.read_config()
     player = Player(cfg)
     player.playTrack(2, 3)
     while(player.playing()):
-        print("p", end="")
+        #print("p", end="")
+        pass
 
