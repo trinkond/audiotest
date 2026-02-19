@@ -5,7 +5,7 @@ import requests
 import time
 import logging
 from audiomath import SystemVolume
-from Regions import Region
+from Regions import Region, Sample
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -77,10 +77,9 @@ class ReaperAPI:
 class Player:
     """ Audio player interface for playing tracks using Reaper """
 
-    def __init__(self, regions : dict[Region], volume : float = 1.0):
-        self.regions = regions
+    def __init__(self, volume : float = 1.0):
         self.track = 0
-        self.region = 0
+        self.region = None
         self.playback_started = 0.0
         self.playback_stopped = False
         self.volume = volume
@@ -95,23 +94,24 @@ class Player:
             self.reaper.Unsolo_all,
         )
 
-    def playTrack(self, track : int, region : int):
+    def playTrack(self, track : int, region : Region):
         if not track in range(1, self.reaper.n_tracks+1):
             raise PlaybackError(f"There is no track with number {track}")
-        if not region in self.regions:
-            raise PlaybackError(f"There is no region with ID {region}")
         self.setVolume(self.volume)
         self.reaper.command(
             self.reaper.Unmute_all,
             self.reaper.Unsolo_all,
             self.reaper.Solo_track(track),
-            self.reaper.Go_to_time(self.regions[region].start_time),
+            self.reaper.Go_to_time(region.start_time),
             self.reaper.Play,
             )
         self.playback_started = time.perf_counter()
         self.playback_stopped = False
         self.region = region
         self.track = track
+
+    def playSample(self, sample : Sample):
+        playTrack(sample.track, sample.region)
 
     def stop(self):
         self.reaper.command(self.reaper.Stop)
@@ -133,9 +133,9 @@ class Player:
 if __name__ == "__main__":
     from Regions import RegionReader
     reader = RegionReader(input("Enter region file name: "))
-    cfg = reader.read_config()
-    player = Player(cfg)
-    player.playTrack(2, 3)
+    regions = reader.read_config()
+    player = Player()
+    player.playTrack(2, regions[3])
     while(player.playing()):
         #print("p", end="")
         pass

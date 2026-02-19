@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Region:
-    """ data class containing Region data"""
+    """ data class containing Region data """
 
     def __init__(self, start_time : float, duration : float):
         self.start_time = start_time
@@ -19,14 +19,35 @@ class Region:
     def __str__(self):
         return repr(self)
 
-class RegionReader():
-    """ 
-        Class for reading region info from generated .csv file
-        NOTE: could be a subclass of abstract class Reader - but... python...
-    """
+    def toList(self):
+        """ returns the Region data as list for easier saving """
+        return [self.start_time, self.duration]
 
-    def __init__(self, fname : str):
-        self.fname : str = fname
+    @staticmethod
+    def fromList(data : list):
+        """ restores Region from list """
+        try:
+            return Region(float(data[0]), float(data[1]))
+        except:
+            logger.error(f"Wrong region list format {data}")
+            return None
+
+class Sample:
+    """ data class containing Sample data """
+
+    def __init__(self, track : int, region : Region):
+        self.track = track
+        self.region = region
+
+    def __repr__(self):
+        return f"Sample(track={self.track!r}, region={self.region!r})"
+
+    def __str__(self):
+        return repr(self)
+
+class RegionReader:
+    def __init__(filename : str):
+        self.fname = filename
 
     def check_fname_format(self) -> bool:
         """ checks whether filename contains .csv """
@@ -92,13 +113,11 @@ class RegionReader():
                     reg_id = int(reg_id.strip())
                     t_s = self.parse_time(split_line[2])
                     t_d = self.parse_time(split_line[4])
-                    regions[reg_id] = Region(t_s, t_d)
-
                 except:
                     logger.error(f'Unsupported region format "{line.strip()}"')
                     continue
                 
-                logger.info(f"Successfully loaded region {reg_id}: {regions[reg_id]}")
+                regions[reg_id] = Region(t_s, t_d)
                 reg_count += 1
 
         if reg_count < 1:

@@ -1,0 +1,16 @@
+Každý test bude obsahovat několik po sobě jdoucích skupin nahrávek.
+
+Ve skupině
+  - možnost lokální reference
+  - možnost zamíchání pořadí v rámci skupiny
+  - stejný typ nahrávek
+  - stejné otázky
+  - stejná škála
+
+Pokud chceme pro každý sample jiné hodnocení, dáme do jiné skupiny
+Group default nastavuje věci pro všechny groups
+
+
+Mydlarna
+MuseScore depresivni song
+Rozvrh
