@@ -131,9 +131,8 @@ class Player:
         SystemVolume.SetVolume(level=self.volume, mute=False)
 
 if __name__ == "__main__":
-    from Regions import RegionReader
-    reader = RegionReader(input("Enter region file name: "))
-    regions = reader.read_config()
+    from Regions import read_config
+    regions = read_config(input("Enter region file name: "))
     player = Player()
     player.playTrack(2, regions[3])
     while(player.playing()):

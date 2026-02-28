@@ -1,22 +1,7 @@
 {
     "version" : "0.1",
     "title" : "Ukázkový test",
-
-    "settings" : {
-        "playback volume" : 100,
-        
-        "display groups" : false,
-        "reorder groups" : false,
-
-        "allow stop" : false,
-        "allow replay" : false,
-        "allow jump" : false,
-        "allow prerate" : false,
-        "allow rating change" : false,
-
-        "require all filled" : true
-
-    },
+    "volume" : 100,
          
     "language" : {
         "sample" : "stopa",
@@ -58,10 +43,17 @@
     },
 
     "default" : {
+        "show groupname" : false,
         "show rating" : true,
         "include reference" : false,
+        
         "questions" : {
-            "obligatory" : true
+            "obligatory" : true,
+            "allow stop" : false,
+            "allow replay" : false,
+            "allow jump" : false,
+            "allow prerate" : false,
+            "allow rating change" : false
         }
     },
 

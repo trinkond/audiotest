@@ -34,6 +34,12 @@ def parseRegions(data : dict) -> dict[int, Region]:
 
     return regions
 
+def saveRegions(regions : dict[int, Region]):
+    data = {}
+    for id, reg in regions.items():
+        data[str(id)] = reg.toList()
+    return data
+
 def parseSamples(data : dict, regions: dict[int, Region]) -> dict[str, Sample]:
     logger.info(f"Parsing samples")
     samples = {}
@@ -62,19 +68,41 @@ def parseSamples(data : dict, regions: dict[int, Region]) -> dict[str, Sample]:
         logger.info(f"Successfully parsed {cc} samples")
     return samples
 
+def saveSamples(samples : dict[str, Sample]):
+    data = {}
+    for id, sample in samples.items():
+        data[str(id)] = [int(sample.track), int(sample.region.id)]
+    return data
+
 def validateRegions(regs : dict[int, Region]) -> bool:
     valid = True
     for key, val in regs.items():
         if type(key) != int or type(val) != Region:
             logger.warning(f"Region {key} not valid, found {val}")
             valid = False
+            continue
+        if val.id != key:
+            logger.warning(f"Region {val.id} is found at a key {key} not matching its id")
+            valid = False
     return valid
 
-def validateSamples(samples : dict[str, Sample]) -> bool:
+def validateSamples(samples : dict[str, Sample], n_tracks : int = None) -> bool:
     valid = True
     for id, val in samples.items():
         if type(id) != str or type(val) != Sample:
             logger.warning(f'Sample "{id}" not valid, found {val}')
+            valid = False
+            continue
+        if type(val.region) != Region:
+            logger.warning(f'Sample "{id}", contains invalid region {val.region}')
+            valid = False
+            continue
+        if type(val.track) != int or (type(n_tracks) == int and not val.track in range(1, n_tracks+1)):
+            logger.warning(f'Sample "{id}", contains invalid track number {val.track}')
+            valid = False
+            continue
+        if val.id != id:
+            logger.warning(f"Sample {val.id} is found at a key {key} not matching its id")
             valid = False
     return valid
 
@@ -91,11 +119,10 @@ config_defuault = {
     "groups" : [],
 
 
-
 }
 
 def loadTest(fname : str) -> dict:
-    """ Reads the .json configuration file for a test """
+    """ Reads the .json configuration file of a test """
 
     try:
         with open(fname, "r", encoding="utf-8") as f:
@@ -119,7 +146,7 @@ def loadTest(fname : str) -> dict:
 ### Regions
     regs = config["regions"]
     if regs is None:
-        logger.error(f'Missing "regions" entry in the test config')
+        logger.error(f'Missing "regions" entry in the test configuration')
         regs = {}
     else:
         regs = parseRegions(regs)
@@ -127,10 +154,10 @@ def loadTest(fname : str) -> dict:
 ### Samples
     samples = config["samples"]
     if samples is None:
-        logger.error(f'Missing "samples" entry in the test config')
+        logger.error(f'Missing "samples" entry in the test configuration')
         samples = {}
     else:
-        samples = parseSamples(samples)
+        samples = parseSamples(samples, regions)
 
 
 
