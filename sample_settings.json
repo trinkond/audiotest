@@ -42,19 +42,20 @@
         }
     },
 
-    "default" : {
+    "questions" : {
+        "obligatory" : true,
+        "allow stop" : false,
+        "allow replay" : false,
+        "allow jump" : false,
+        "allow prerate" : false,
+        "allow rating change" : false
+    },
+
+    "defaultgroup" : {
         "show groupname" : false,
         "show rating" : true,
-        "include reference" : false,
+        "include reference" : false
         
-        "questions" : {
-            "obligatory" : true,
-            "allow stop" : false,
-            "allow replay" : false,
-            "allow jump" : false,
-            "allow prerate" : false,
-            "allow rating change" : false
-        }
     },
 
     "groups" : [

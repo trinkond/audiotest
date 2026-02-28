@@ -10,9 +10,9 @@ class Region:
     """ data class containing Region data """
 
     def __init__(self, start_time : float, duration : float, id : int = None):
-        self.id = id
-        self.start_time = start_time
-        self.duration = duration
+        self.id : int = id
+        self.start_time : float = start_time
+        self.duration : float = duration
 
     def __repr__(self):
         id = "" if self.id is None else str(self.id)
@@ -26,10 +26,10 @@ class Region:
         return [self.start_time, self.duration]
 
     @staticmethod
-    def fromList(data : list):
+    def fromList(data : list, id : int = None):
         """ restores Region from list """
         try:
-            return Region(float(data[0]), float(data[1]))
+            return Region(float(data[0]), float(data[1]), id)
         except:
             logger.error(f"Wrong region list format {data}")
             return None
@@ -38,9 +38,9 @@ class Sample:
     """ data class containing Sample data """
 
     def __init__(self, track : int, region : Region, id : str = None):
-        self.id = id
-        self.track = track
-        self.region = region
+        self.id : str = id
+        self.track : int = track
+        self.region : Region = region
 
     def __repr__(self):
         id = "" if self.id is None else f'"{str(self.id)}"' 
@@ -79,7 +79,7 @@ def parse_time(time : str) -> float:
     return 60 * minutes + seconds
 
 def read_config(fname : str) -> list[Region]:
-    """ reads through given .csv file and returns a dict of Regions """
+    """ reads through given .csv export from Reaper and returns a dict of Regions """
     logger.info(f'Loading regions from "{fname}"')
 
     if not check_fname_csv(fname):
@@ -124,3 +124,106 @@ def read_config(fname : str) -> list[Region]:
         logger.info(f"Successfully loaded {len(regions)} regions")
     return regions
 
+def validateRegions(regs : dict[int, Region]) -> bool:
+    """ tests whether a given dict of regions is valid for playback """
+    valid = True
+    for key, val in regs.items():
+        if type(key) != int or type(val) != Region:
+            logger.warning(f"Region {key} not valid, found {val}")
+            valid = False
+            continue
+        if val.id != key:
+            logger.warning(f"Region {val.id} is found at a key {key} not matching its id")
+            valid = False
+    return valid
+
+def validateSamples(samples : dict[str, Sample], n_tracks : int = None) -> bool:
+    """ tests whether a given dict of samples is valid for playback """
+    valid = True
+    for id, val in samples.items():
+        if type(id) != str or type(val) != Sample:
+            logger.warning(f'Sample "{id}" not valid, found {val}')
+            valid = False
+            continue
+        if type(val.region) != Region:
+            logger.warning(f'Sample "{id}", contains invalid region {val.region}')
+            valid = False
+            continue
+        if type(val.track) != int or (type(n_tracks) == int and not val.track in range(1, n_tracks+1)):
+            logger.warning(f'Sample "{id}", contains invalid track number {val.track}')
+            valid = False
+            continue
+        if val.id != id:
+            logger.warning(f"Sample {val.id} is found at a key {key} not matching its id")
+            valid = False
+    return valid
+
+def parseRegions(data : dict) -> dict[int, Region]:
+    """ reads the json formatted regions entry into Region objects
+    invalid regions are parsed as None """
+    logger.info(f"Parsing regions")
+    regions = {}
+    cc = 0
+    for reg, dat in data.items():
+        try:
+            reg = int(reg)
+        except:
+            logger.error(f'Unsupported region ID "{reg}"')
+            continue
+
+        dat = Region.fromList(dat, reg)
+        if dat is None:
+            logger.error(f"Failed to parse region {reg}")
+        else:
+            cc += 1
+        regions[reg] = dat
+
+    if regions == {}:
+        logger.warning("No regions were parsed")
+    else:
+        logger.info(f"Successfully parsed {cc} regions")
+    return regions
+
+def saveRegions(regions : dict[int, Region]):
+    """ formats the Regions for saving as json """
+    data = {}
+    for reg in regions.values():
+        data[str(reg.id)] = reg.toList()
+    return data
+
+def parseSamples(data : dict, regions: dict[int, Region]) -> dict[str, Sample]:
+    """ reads the json formatted samples entry into Sample objects
+    matches and adds the corresponding regions, if not found, puts None """
+    logger.info(f"Parsing samples")
+    samples = {}
+    cc = 0
+    for id, dat in data.items():
+        try:
+            if type(dat) != list or len(dat) != 2:
+                raise Exception()
+            track = int(dat[0])
+            regid = int(dat[1])
+        except:
+            logger.error(f'Sample "{id}" is in incompatible format')
+            continue
+        try:
+            region = regions[regid]
+            cc += 1
+        except:
+            logger.warning(f'Region {regid} needed by sample "{id}" not found')
+            region = None
+
+        samples[id] = Sample(track, region, id)
+
+    if samples == {}:
+        logger.warning("No samples were parsed")
+    else:
+        logger.info(f"Successfully parsed {cc} samples")
+    return samples
+
+def saveSamples(samples : dict[str, Sample]):
+    """ formats the Samples for saving as json """
+    data = {}
+    for sample in samplesvalues():
+        data[str(sample.id)] = [int(sample.track), int(sample.region.id)]
+    return data

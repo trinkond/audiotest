@@ -7,104 +7,16 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from Regions import Region, Sample
+from Regions import Region, Sample, validateRegions, validateSamples
 
-def parseRegions(data : dict) -> dict[int, Region]:
-    logger.info(f"Parsing regions")
-    regions = {}
-    cc = 0
-    for reg, dat in data.items():
-        try:
-            reg = int(reg)
-        except:
-            logger.error(f'Unsupported region ID "{reg}"')
-            continue
-
-        dat = Region.fromList(dat)
-        if dat is None:
-            logger.error(f"Failed to parse region {reg}")
-        else:
-            cc += 1
-        regions[reg] = dat
-
-    if regions == {}:
-        logger.warning("No regions were parsed")
-    else:
-        logger.info(f"Successfully parsed {cc} regions")
-
-    return regions
-
-def saveRegions(regions : dict[int, Region]):
-    data = {}
-    for id, reg in regions.items():
-        data[str(id)] = reg.toList()
+def loadDefault(data : dict, default : dict) -> dict:
+    """ Loads data from the dict, filling missing keys by defaults and checking type """
+    data = default | data   # joining the dictionaries
+    for key in default:
+        if type(data[key]) != type(default[key]):
+            logger.error(f'Entry for "{key}" is incompatible format {type(data[key])}, default value {default[key]} has been taken')
+            data[key] = default[key]
     return data
-
-def parseSamples(data : dict, regions: dict[int, Region]) -> dict[str, Sample]:
-    logger.info(f"Parsing samples")
-    samples = {}
-    cc = 0
-    for id, dat in data.items():
-        try:
-            if type(dat) != list or len(dat) != 2:
-                raise Exception()
-            track = dat[0]
-            regid = dat[1]
-        except:
-            logger.error(f'Sample "{id}" is in incompatible format')
-            continue
-        try:
-            region = regions[int(regid)]
-            cc += 1
-        except:
-            logger.warning(f'Region {regid} needed by sample "{id}" not found')
-            region = None
-
-        samples[id] = Sample(track, region)
-
-    if samples == {}:
-        logger.warning("No samples were parsed")
-    else:
-        logger.info(f"Successfully parsed {cc} samples")
-    return samples
-
-def saveSamples(samples : dict[str, Sample]):
-    data = {}
-    for id, sample in samples.items():
-        data[str(id)] = [int(sample.track), int(sample.region.id)]
-    return data
-
-def validateRegions(regs : dict[int, Region]) -> bool:
-    valid = True
-    for key, val in regs.items():
-        if type(key) != int or type(val) != Region:
-            logger.warning(f"Region {key} not valid, found {val}")
-            valid = False
-            continue
-        if val.id != key:
-            logger.warning(f"Region {val.id} is found at a key {key} not matching its id")
-            valid = False
-    return valid
-
-def validateSamples(samples : dict[str, Sample], n_tracks : int = None) -> bool:
-    valid = True
-    for id, val in samples.items():
-        if type(id) != str or type(val) != Sample:
-            logger.warning(f'Sample "{id}" not valid, found {val}')
-            valid = False
-            continue
-        if type(val.region) != Region:
-            logger.warning(f'Sample "{id}", contains invalid region {val.region}')
-            valid = False
-            continue
-        if type(val.track) != int or (type(n_tracks) == int and not val.track in range(1, n_tracks+1)):
-            logger.warning(f'Sample "{id}", contains invalid track number {val.track}')
-            valid = False
-            continue
-        if val.id != id:
-            logger.warning(f"Sample {val.id} is found at a key {key} not matching its id")
-            valid = False
-    return valid
 
 config_defuault = {
     "version" : None,
@@ -115,11 +27,17 @@ config_defuault = {
 
     "regions" : None,
     "samples" : None,
+    "questions" : None,
     "ratings" : None,
+
     "groups" : [],
+}
+
+group_default = {
 
 
 }
+
 
 def loadTest(fname : str) -> dict:
     """ Reads the .json configuration file of a test """
