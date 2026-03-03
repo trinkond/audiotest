@@ -10,15 +10,20 @@ logger = logging.getLogger(__name__)
 from Regions import Region, Sample, validateRegions, validateSamples
 
 def loadDefault(data : dict, default : dict) -> dict:
-    """ Loads data from the dict, filling missing keys by defaults and checking type """
+    """ Loads data from the dict, filling missing keys with defaults and checking type """
     data = default | data   # joining the dictionaries
     for key in default:
+        if default[key] is None:
+            continue
         if type(data[key]) != type(default[key]):
             logger.error(f'Entry for "{key}" is incompatible format {type(data[key])}, default value {default[key]} has been taken')
             data[key] = default[key]
     return data
 
-config_defuault = {
+
+
+
+config_default = {
     "version" : None,
     "title" : None,
     "volume" : 100,
@@ -33,10 +38,6 @@ config_defuault = {
     "groups" : [],
 }
 
-group_default = {
-
-
-}
 
 
 def loadTest(fname : str) -> dict:
@@ -59,7 +60,7 @@ def loadTest(fname : str) -> dict:
         logger.error(f'Failed to load test configuration from "{fname}", unexpected error: {e}')
         return None
 
-    config = config_default | data
+    config = loadDefault(data, config_default)
 
 ### Regions
     regs = config["regions"]

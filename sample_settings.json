@@ -53,9 +53,7 @@
 
     "defaultgroup" : {
         "show groupname" : false,
-        "show rating" : true,
-        "include reference" : false
-        
+        "show rating" : true
     },
 
     "groups" : [

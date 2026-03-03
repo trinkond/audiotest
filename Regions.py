@@ -128,7 +128,7 @@ def validateRegions(regs : dict[int, Region]) -> bool:
     """ tests whether a given dict of regions is valid for playback """
     valid = True
     for key, val in regs.items():
-        if type(key) != int or type(val) != Region:
+        if type(key) != int or not isinstance(val, Region):
             logger.warning(f"Region {key} not valid, found {val}")
             valid = False
             continue
@@ -141,11 +141,11 @@ def validateSamples(samples : dict[str, Sample], n_tracks : int = None) -> bool:
     """ tests whether a given dict of samples is valid for playback """
     valid = True
     for id, val in samples.items():
-        if type(id) != str or type(val) != Sample:
+        if type(id) != str or not isinstance(val, Sample):
             logger.warning(f'Sample "{id}" not valid, found {val}')
             valid = False
             continue
-        if type(val.region) != Region:
+        if not isinstance(val.region, Region):
             logger.warning(f'Sample "{id}", contains invalid region {val.region}')
             valid = False
             continue
@@ -184,7 +184,7 @@ def parseRegions(data : dict) -> dict[int, Region]:
         logger.info(f"Successfully parsed {cc} regions")
     return regions
 
-def saveRegions(regions : dict[int, Region]):
+def saveRegions(regions : dict[int, Region]) -> dict:
     """ formats the Regions for saving as json """
     data = {}
     for reg in regions.values():
