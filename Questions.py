@@ -9,41 +9,49 @@ class Rating:
     def __init__(self, id : str = None):
         self.id = id
 
+    TYPE = None
+
 class RatingDiscrete(Rating):
 
-    def __init__(self, values : dict[int, str], id : str = None):
+    def __init__(self, values : dict[str, str], id : str = None):
         super().__init__(id)
         self.scale = sorted((int(k), str(v)) for k, v in values.items())
+    
+    TYPE = "discrete"
 
 class RatingContinuous(Rating):
     
-    def __init__(self, minval : int, maxval : int, step : int, id :str  = None):
+    def __init__(self, minval : int, maxval : int, step : int, id : str = None):
         super().__init__(id)
         self.minval, self.maxval, self.step = int(minval), int(maxval), int(step)
         if self.minval > self.maxval:
-            raise ValueError(f"min rating ({self.min}) is greater than max ({self.max})")
+            raise ValueError(f"min rating ({self.minval}) is greater than max ({self.maxval})")
+
+    TYPE = "continuous"
 
 def parseRating(data : dict, id = None) -> Rating:
+    """ parses a rating from the data json format into Rating object, returns None if invalid """
     try:
         rtype = data["type"]
     except KeyError:
         logger.error(f'Rating {str(id) + " " if id is not None else ""}cannot be parsed, missing "type" key')
         return None
 
-    if rtype.lower() == "discrete":
-        del data["type"]
+    if rtype.lower() == RatingDiscrete.TYPE:
         try:
-            return RatingDiscrete(data.copy().pop("type"), id)
+            values = data.copy()
+            values.pop("type")
+            return RatingDiscrete(values, id)
         except (TypeError, ValueError, KeyError):
             logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
             return None
 
-    elif rtype.lower() == "continuous":
+    elif rtype.lower() == RatingContinuous.TYPE:
         try:
-            min = data["min"]
-            max = data["max"]
+            minval = data["min"]
+            maxval = data["max"]
             step = data["step"]
-            return RatingContinuous(min, max, step, id)
+            return RatingContinuous(minval, maxval, step, id)
         except (KeyError, TypeError, ValueError):
             logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
             return None
@@ -53,15 +61,14 @@ def parseRating(data : dict, id = None) -> Rating:
         return None
 
 def parseRatings(data : dict) -> dict[str, Rating]:
+    """ parses all ratings from json dict into Rating objects """
     logger.info(f"Parsing ratings")
     ratings = {}
     cc = 0
     for id, val in data.items():
         id = str(id)
         rat = parseRating(val, id)
-        if rat is None:
-            logger.error(f"Failed to parse rating {id}")
-        else:
+        if rat is not None:
             cc += 1
         ratings[id] = rat
     if ratings == {}:
@@ -70,12 +77,74 @@ def parseRatings(data : dict) -> dict[str, Rating]:
         logger.info(f"Successfully parsed {cc} ratings")
     return ratings
 
+def saveRatings(ratings : dict[str, Rating]) -> dict:
+    """ formats the Ratings as a dict for saving as json """
+    data = {}
+    for rat in ratings.values():
+        if isinstance(rat, RatingContinuous):
+            rat_dict = {}
+            rat_dict["min"] = rat.minval
+            rat_dict["max"] = rat.maxval
+            rat_dict["step"] = rat.step
+
+        elif isinstance(rat, RatingDiscrete):
+            rat_dict = {str(k): v for k, v in rat.scale}
+
+        else:
+            raise TypeError(f'Rating type "{type(rat)}" cannot to be saved')
+        
+        rat_dict["type"] = rat.__class__.TYPE
+        data[rat.id] = rat_dict
+    return data
+
 class Question:
     """ class representing question given to the listeners """
-    def __init__(self, text : str, rating : Rating, forced=True):
+    def __init__(self, text : str, rating : Rating, id : str = None):
         self.text = text
         self.rating = rating
-        self.forced = forced
 
-def parseQuestion():
-    return None
+def parseQuestion(data : dict, ratings : dict[str, Rating], id : str = None) -> Question:
+    """ parse a question from data json format into Question object
+    resolves reference to the rating of the question """
+    try:
+        text = str(data["text"])
+    except KeyError:
+        logger.warning(f'Question {str(id) + " " if id is not None else ""}is missing "text"')
+        text = None
+    try:
+        rating = str(data["rating"])
+        rating = ratings[rating]
+        if rating is None:
+            raise ValueError()
+    except (KeyError, ValueError):
+        logger.warning(f'Question {str(id) + " " if id is not None else ""}has "rating" missing or invalid')
+        rating = None
+    return Question(text, rating, id)
+
+def parseQuestions(data : dict, ratings : dict[str, Rating]) -> dict[str, Question]:
+    """ parses json formatted questions to Question objects
+    matches and adds ratings, if not found, puts None """
+    logger.info(f"Parsing questions")
+    questions = {}
+    cc = 0
+    for id, val in data.items():
+        id = str(id)
+        qst = parseQuestion(val, ratings, id)
+        if qst is not None:
+            cc += 1
+        questions[id] = qst
+    if questions == {}:
+        logger.warning("No questions were parsed")
+    else:
+        logger.info(f"Successfully parsed {cc} questions")
+    return questions
+
+def saveQuestions(questions : dict[str, Question]) -> dict:
+    """ formats the Samples as a dict for saving into json """
+    data = {}
+    for qst in quesions.values():
+        qst_dict = {}
+        qst_dict["text"] = str(qst.text)
+        qst_dict["rating"] = str(qst.rating.id)
+        data[str(qst.id)] = qst_dict
+    return data

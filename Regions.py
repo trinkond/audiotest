@@ -223,7 +223,7 @@ def parseSamples(data : dict, regions: dict[int, Region]) -> dict[str, Sample]:
         logger.info(f"Successfully parsed {cc} samples")
     return samples
 
-def saveSamples(samples : dict[str, Sample]):
+def saveSamples(samples : dict[str, Sample]) -> dict:
     """ formats the Samples as a dict for saving as json """
     data = {}
     for sample in samples.values():

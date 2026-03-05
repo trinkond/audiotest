@@ -36,13 +36,24 @@
 
         "mushra" : {
             "type" : "continuous",
-            "min" : 0.0,
-            "max" : 100.0,
-            "step" : 1.0
+            "min" : 0,
+            "max" : 100,
+            "step" : 1
         }
     },
 
     "questions" : {
+        "otazka" : {
+            "text" : null,
+            "rating" : "compare"
+        },
+        "q1" : {
+            "text" : "Jaké to bylo?",
+            "rating" : "basic"
+        }
+    },
+
+    "question_tags" : {
         "obligatory" : true,
         "allow stop" : false,
         "allow replay" : false,
@@ -71,10 +82,8 @@
             ],
             "instructions" : null,
             "questions" : [
-                {
-                    "text" : "Jaké to bylo?",
-                    "rating" : "basic"
-                }
+                    "q1",
+                    "q1"
             ]
         },
 
@@ -89,10 +98,7 @@
                 ["1", "French 2"]
             ],
             "questions" : [
-                {
-                    "text" : null,
-                    "rating" : "compare"
-                }
+                "otazka"
             ]
         }
     ]
