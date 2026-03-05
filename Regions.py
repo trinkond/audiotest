@@ -29,8 +29,8 @@ class Region:
     def fromList(data : list, id : int = None):
         """ restores Region from list """
         try:
-            return Region(float(data[0]), float(data[1]), id)
-        except:
+            return Region(float(data[0]), float(data[1]), int(id))
+        except (IndexError, TypeError, ValueError):
             logger.error(f"Wrong region list format {data}")
             return None
 
@@ -78,7 +78,7 @@ def parse_time(time : str) -> float:
         raise ValueError("Unsupported time format")
     return 60 * minutes + seconds
 
-def read_config(fname : str) -> list[Region]:
+def read_config(fname : str) -> dict[int, Region]:
     """ reads through given .csv export from Reaper and returns a dict of Regions """
     logger.info(f'Loading regions from "{fname}"')
 
@@ -87,7 +87,7 @@ def read_config(fname : str) -> list[Region]:
 
     if not check_file_path(fname):
         logger.error(f'File "{fname}" not found')
-        return regions
+        return {}
 
     reg_count = 0
     regions = {}
@@ -111,7 +111,7 @@ def read_config(fname : str) -> list[Region]:
                 reg_id = int(reg_id.strip())
                 t_s = parse_time(split_line[2])
                 t_d = parse_time(split_line[4])
-            except:
+            except (IndexError, TypeError, ValueError):
                 logger.error(f'Unsupported region format "{line.strip()}"')
                 continue
             
@@ -154,7 +154,7 @@ def validateSamples(samples : dict[str, Sample], n_tracks : int = None) -> bool:
             valid = False
             continue
         if val.id != id:
-            logger.warning(f"Sample {val.id} is found at a key {key} not matching its id")
+            logger.warning(f"Sample {val.id} is found at key {id} not matching its id")
             valid = False
     return valid
 
@@ -167,7 +167,7 @@ def parseRegions(data : dict) -> dict[int, Region]:
     for reg, dat in data.items():
         try:
             reg = int(reg)
-        except:
+        except (ValueError, TypeError):
             logger.error(f'Unsupported region ID "{reg}"')
             continue
 
@@ -185,7 +185,7 @@ def parseRegions(data : dict) -> dict[int, Region]:
     return regions
 
 def saveRegions(regions : dict[int, Region]) -> dict:
-    """ formats the Regions for saving as json """
+    """ formats the Regions as a dict for saving as json """
     data = {}
     for reg in regions.values():
         data[str(reg.id)] = reg.toList()
@@ -198,18 +198,20 @@ def parseSamples(data : dict, regions: dict[int, Region]) -> dict[str, Sample]:
     samples = {}
     cc = 0
     for id, dat in data.items():
+        id = str(id)
         try:
             if type(dat) != list or len(dat) != 2:
-                raise Exception()
+                raise TypeError()
             track = int(dat[0])
             regid = int(dat[1])
-        except:
+        except (TypeError, ValueError, IndexError):
             logger.error(f'Sample "{id}" is in incompatible format')
+            samples[id] = None
             continue
         try:
             region = regions[regid]
             cc += 1
-        except:
+        except KeyError:
             logger.warning(f'Region {regid} needed by sample "{id}" not found')
             region = None
 
@@ -222,8 +224,8 @@ def parseSamples(data : dict, regions: dict[int, Region]) -> dict[str, Sample]:
     return samples
 
 def saveSamples(samples : dict[str, Sample]):
-    """ formats the Samples for saving as json """
+    """ formats the Samples as a dict for saving as json """
     data = {}
-    for sample in samplesvalues():
+    for sample in samples.values():
         data[str(sample.id)] = [int(sample.track), int(sample.region.id)]
     return data
