@@ -11,6 +11,13 @@ class Rating:
 
     TYPE = None
 
+    def __repr__(self):
+        id = "" if self.id is None else str(self.id)
+        return f'Rating {id}'
+
+    def __str__(self):
+        return repr(self)
+
 class RatingDiscrete(Rating):
 
     def __init__(self, values : dict[str, str], id : str = None):
@@ -18,6 +25,11 @@ class RatingDiscrete(Rating):
         self.scale = sorted((int(k), str(v)) for k, v in values.items())
     
     TYPE = "discrete"
+
+    def __repr__(self):
+        id = "" if self.id is None else str(self.id)
+        scale = [f'{k}:"{v}"' for k, v in self.scale]
+        return f"RatingDiscrete {id}(values=({', '.join(scale)}))"
 
 class RatingContinuous(Rating):
     
@@ -28,6 +40,10 @@ class RatingContinuous(Rating):
             raise ValueError(f"min rating ({self.minval}) is greater than max ({self.maxval})")
 
     TYPE = "continuous"
+
+    def __repr__(self):
+        id = "" if self.id is None else str(self.id)
+        return f"RatingContinuous {id}(min={self.minval}, max={self.maxval}, step={self.step})"
 
 def parseRating(data : dict, id = None) -> Rating:
     """ parses a rating from the data json format into Rating object, returns None if invalid """
@@ -102,6 +118,14 @@ class Question:
     def __init__(self, text : str, rating : Rating, id : str = None):
         self.text = text
         self.rating = rating
+        self.id = id
+
+    def __repr__(self):
+        id = "" if self.id is None else str(self.id)
+        return f'Question {id}(text="{self.text}", rating={self.rating})'
+
+    def __str__(self):
+        return repr(self)
 
 def parseQuestion(data : dict, ratings : dict[str, Rating], id : str = None) -> Question:
     """ parse a question from data json format into Question object

@@ -7,14 +7,14 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from Regions import Region, Sample, validateRegions, validateSamples
-from Questions import Ratings, parseRatings
+from Regions import parseRegions, parseSamples
+from Questions import parseRatings, parseQuestions
 
 def loadDefault(data : dict, default : dict) -> dict:
     """ Loads data from the dict, filling missing keys with defaults and checking type """
     data = data.copy()
     for key in default:
-        if not key in newdict:
+        if not key in data:
             logger.warning(f'Missing entry for "{key}", filled with default value {default[key]}')
             data[key] = default[key]
             continue
@@ -68,35 +68,23 @@ def loadTest(fname : str) -> dict:
     regs = config["regions"]
     regs = parseRegions(regs)
     samples = config["samples"]
-    samples = parseSamples(samples, regions)
-    ratings = config["ratings"]
-    ratings = parseRatings(ratings)
+    samples = parseSamples(samples, regs)
+    rats = config["ratings"]
+    rats = parseRatings(rats)
     quests = config["questions"]
-    quests = parseQuestions(quests)
+    quests = parseQuestions(quests, rats)
+
+    return (samples, quests)
 
 
 
 
 fname = "sample_settings.json"
 
-
-with open(fname, "r") as f:
-    data = json.load(f)
-
-
-if "regions" in data:
-    regions = parseRegions(data["regions"])
-else:
-    logger.error("Missing region section")
-    regions = {}
-
-
-print(regions)
-print(data["samples"])
-
-samples = parseSamples(data["samples"], regions)
+samples, quests = loadTest(fname)
 
 print(samples)
+print(quests)
 
 
 

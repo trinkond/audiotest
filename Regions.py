@@ -16,7 +16,7 @@ class Region:
 
     def __repr__(self):
         id = "" if self.id is None else str(self.id)
-        return f"Region{id}(start_time={self.start_time!r}, duration={self.duration!r})"
+        return f"Region {id}(start_time={self.start_time}, duration={self.duration})"
 
     def __str__(self):
         return repr(self)
@@ -43,8 +43,8 @@ class Sample:
         self.region : Region = region
 
     def __repr__(self):
-        id = "" if self.id is None else f'"{str(self.id)}"' 
-        return f"Sample{id}(track={self.track!r}, region={self.region!r})"
+        id = "" if self.id is None else str(self.id)
+        return f"Sample {id}(track={self.track}, region={self.region})"
 
     def __str__(self):
         return repr(self)
