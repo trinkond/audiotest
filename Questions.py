@@ -95,8 +95,9 @@ def parseRatings(data : dict) -> dict[str, Rating]:
 
 def saveRatings(ratings : dict[str, Rating]) -> dict:
     """ formats the Ratings as a dict for saving as json """
+    logger.info("Saving ratings")
     data = {}
-    for rat in ratings.values():
+    for id, rat in ratings.items():
         if isinstance(rat, RatingContinuous):
             rat_dict = {}
             rat_dict["min"] = rat.minval
@@ -107,7 +108,9 @@ def saveRatings(ratings : dict[str, Rating]) -> dict:
             rat_dict = {str(k): v for k, v in rat.scale}
 
         else:
-            raise TypeError(f'Rating type "{type(rat)}" cannot to be saved')
+            logger.warning(f'Rating type "{type(rat)}" cannot to be saved')
+            data[str(id)] = None
+            continue
         
         rat_dict["type"] = rat.__class__.TYPE
         data[rat.id] = rat_dict
@@ -165,10 +168,11 @@ def parseQuestions(data : dict, ratings : dict[str, Rating]) -> dict[str, Questi
 
 def saveQuestions(questions : dict[str, Question]) -> dict:
     """ formats the Samples as a dict for saving into json """
+    logger.info("Saving questions")
     data = {}
     for qst in quesions.values():
         qst_dict = {}
-        qst_dict["text"] = str(qst.text)
-        qst_dict["rating"] = str(qst.rating.id)
+        qst_dict["text"] = qst.text
+        qst_dict["rating"] = qst.rating.id
         data[str(qst.id)] = qst_dict
     return data

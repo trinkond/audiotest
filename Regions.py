@@ -186,6 +186,7 @@ def parseRegions(data : dict) -> dict[int, Region]:
 
 def saveRegions(regions : dict[int, Region]) -> dict:
     """ formats the Regions as a dict for saving as json """
+    logger.info("Saving regions")
     data = {}
     for reg in regions.values():
         data[str(reg.id)] = reg.toList()
@@ -225,7 +226,17 @@ def parseSamples(data : dict, regions: dict[int, Region]) -> dict[str, Sample]:
 
 def saveSamples(samples : dict[str, Sample]) -> dict:
     """ formats the Samples as a dict for saving as json """
+    logger.info("saving Samples")
     data = {}
-    for sample in samples.values():
-        data[str(sample.id)] = [int(sample.track), int(sample.region.id)]
+    for id, sample in samples.items():
+        if sample is None:
+            data[str(id)] = None
+            logger.warning(f"Sample {id} is None")
+            continue
+        try:
+            reg_id = sample.region.id
+        except AttributeError:
+            reg_id = None
+            logger.warning(f"Sample {id} doesn't have a valid region")
+        data[str(sample.id)] = [sample.track, reg_id]
     return data

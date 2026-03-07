@@ -67,7 +67,7 @@
         "show rating" : true
     },
 
-    "groups" : [
+    "playlists" : [
         {
             "name" : "reference",
             "samples" : ["ref"]
