@@ -48,12 +48,12 @@ class RatingContinuous(Rating):
 def parseRating(data : dict, id = None) -> Rating:
     """ parses a rating from the data json format into Rating object, returns None if invalid """
     try:
-        rtype = data["type"]
+        rtype = str(data["type"])
     except KeyError:
         logger.error(f'Rating {str(id) + " " if id is not None else ""}cannot be parsed, missing "type" key')
         return None
 
-    if rtype.lower() == RatingDiscrete.TYPE:
+    if rtype == RatingDiscrete.TYPE:
         try:
             values = data.copy()
             values.pop("type")
@@ -62,7 +62,7 @@ def parseRating(data : dict, id = None) -> Rating:
             logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
             return None
 
-    elif rtype.lower() == RatingContinuous.TYPE:
+    elif rtype == RatingContinuous.TYPE:
         try:
             minval = data["min"]
             maxval = data["max"]

@@ -5,7 +5,7 @@ import requests
 import time
 import logging
 from audiomath import SystemVolume
-from Regions import Region, Sample
+from Samples import Region, Sample
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -131,7 +131,7 @@ class Player:
         SystemVolume.SetVolume(level=self.volume, mute=False)
 
 if __name__ == "__main__":
-    from Regions import read_config
+    from Samples import read_config
     regions = read_config(input("Enter region file name: "))
     player = Player()
     player.playTrack(2, regions[3])

@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-from Regions import parseRegions, parseSamples
+from Samples import parseRegions, parseSamples
 from Questions import parseRatings, parseQuestions
 
 def loadDefault(data : dict, default : dict) -> dict:
@@ -88,12 +88,12 @@ class Playlist:
         quests = oquests
         return Playlist(samps, instructs, quests, reorder, name)
 
-def parsePlaylists(data : list) -> dict[str : Playlist]:
+def parsePlaylists(data : list, samples : dict[str : Sample], questions : dict[str : Question]) -> list[Playlist]:
     """ parses a list loaded from json into a list of Playlists """
     logger.info("Parsing playlists")
     plays = []
     for val in data:
-        pl = Playlist.fromDict(val)
+        pl = Playlist.fromDict(val, samples, questions)
         if pl is not None:
             cc += 1
             plays.append(pl)
@@ -103,11 +103,11 @@ def parsePlaylists(data : list) -> dict[str : Playlist]:
         logger.info(f"Successfully parsed {cc} playlists")
     return plays
 
-def savePlaylists(playlists : dict[str : Playlist]) -> list:
+def savePlaylists(playlists : list[Playlist]) -> list:
     """ formats the Playlist as a list for saving as json """
     logger.info("Saving playlists")
     data = []
-    for pl in playlists.values():
+    for pl in playlists:
         pl_dict = {}
         pl_dict["name"] = pl.name
         pl_dict["samples"] = [s.id for s in pl.samples]
@@ -166,8 +166,10 @@ def loadTest(fname : str) -> dict:
     rats = parseRatings(rats)
     quests = config["questions"]
     quests = parseQuestions(quests, rats)
+    plays = config["playlists"]
+    plays = parsePlaylists(plays, samples, quests)
 
-    return (samples, quests)
+    return (samples, quests, plays)
 
 
 
