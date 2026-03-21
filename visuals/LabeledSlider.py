@@ -1,39 +1,18 @@
-# Written by Ondrej Trinkewitz
-# Holds the object widgets for the visual user interface
-
-from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton, QSlider, QLineEdit
+from PyQt6.QtWidgets import QWidget, QSlider, QLineEdit
 from PyQt6.QtGui import QPainter, QColor
 from PyQt6.QtWidgets import QStyle, QStyleOptionSlider
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 
 import math
 
-from Samples import Sample
-from Questions import Question, Rating
-
-class SampleWidget(QWidget):
-    def __init__(self, sample : Sample):
-        super().__init__()
-
-        self.sample = sample   # store reference to the sample object
-
-        label = QLabel(sample.id)
-        play_button = QPushButton("Play")
-
-        layout = QHBoxLayout()
-        layout.addWidget(label)
-        layout.addWidget(play_button)
-
-        self.setLayout(layout)
-
-
 class LabeledSlider(QWidget):
+    """ Slider that supports float values and a custom step,
+    renders with automatic labels underneath the slider """
     
     valueChanged = pyqtSignal(object)
     
     def __init__(self, minimum, maximum, step, parent=None):
-        """ slider allowing for float values and custom step,
-        displays with labels underneath the slider """
+        
         assert maximum > minimum
         super().__init__(parent)
         self.minval = minimum
@@ -42,16 +21,16 @@ class LabeledSlider(QWidget):
         self.n_steps = int(round((self.maxval - self.minval) / self.step))
         self.ticks = []                         # labeled ticks displayed on the slider
         self.SLIDER_OFFSET = self.fontMetrics().horizontalAdvance("mmmm")
-        self.SLIDER_HEIGHT = 100 #px
+        self.SLIDER_HEIGHT = 20 #px
         self.TICK_HEIGHT = 5 #px
         self.LABEL_OFFSET = 10 #px
-        self.LABEL_SPACING = 20 #px
+        self.LABEL_SPACING = 10 #px
 
         self.slider = QSlider(Qt.Orientation.Horizontal, self)
         self.slider.setRange(0, self.n_steps)
         self.slider.setTickPosition(QSlider.TickPosition.NoTicks)
-#TODO -20 neni to co chci
-        self.slider.setGeometry(0, 0, self.width(), self.height() - 20)
+
+        self.resizeEvent(None)  # generate the ticks and scales
 
         # on slider value change emit signal with the new value
         self.slider.valueChanged.connect(lambda _: self.valueChanged.emit(self.value()))
@@ -131,20 +110,20 @@ class LabeledSlider(QWidget):
             start_step = 0                                          # start step is at minval
 
         ticks = []
-        print(f"start step {start_step} end at {self.n_steps} with step {tick_step}")
         for i in range(start_step, self.n_steps + 1, tick_step):    # iterate all the slider steps
             ticks.append(self.minval + i*self.step)                 # add the stepped value to the list
 
-        print(ticks)
         return ticks
 
-#TODO dodelat size hinty
     def sizeHint(self):
-        return QSize(800, 80)
+        height = self.SLIDER_HEIGHT + self.LABEL_OFFSET + self.fontMetrics().height()
+        return QSize(500, height)
 
     def minimumSizeHint(self):
-        return self.sizeHint()
-
+        height = self.SLIDER_HEIGHT + self.LABEL_OFFSET + self.fontMetrics().height()
+        width = 100 + 2*self.SLIDER_OFFSET
+        return QSize(width, height)
+        
     def resizeEvent(self, event):
         self.ticks = self._getTicks()                               # recompute the tick marks
         sliderLeft = self.SLIDER_OFFSET
@@ -170,37 +149,3 @@ class LabeledSlider(QWidget):
                 y + self.LABEL_OFFSET + fm.ascent(),
                 label
             )
-
-class RatingWidget(QWidget):
-    def __init__(self, minimum=0, maximum=100, step = 1):
-        super().__init__()
-
-        #self.rating = rating
-
-        layout = QHBoxLayout()
-
-        slider = LabeledSlider(minimum, maximum, step)
-        slider.setMaximumWidth(900)  # slider won't grow past 300px
-
-        value_field = QLineEdit()
-        value_field.setReadOnly(True)
-        value_field.setText(str(slider.value()))
-        value_field.setFixedWidth(80)  # fixed width 80px
-
-        slider.valueChanged.connect(lambda v: value_field.setText(str(v)))
-
-        layout.addWidget(slider)
-        layout.addWidget(value_field)
-
-        self.setLayout(layout)
-
-
-
-class QuestionWidget(QWidget):
-    def __init__(self, question : Question):
-        super.__init__()
-
-        self.question = question
-
-        label = QLabel(question.id)
-        

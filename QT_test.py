@@ -3,7 +3,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QLabel, QVBoxLayout
 from Samples import Region, Sample
-from Visuals import SampleWidget, RatingWidget
+from visuals import SampleWidget, RatingWidget
 
 app = QApplication(sys.argv)
 
