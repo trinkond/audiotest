@@ -8,7 +8,7 @@ class Rating:
     """ Class representing a rating scale """
     def __init__(self, id : str = None):
         self.id = id
-
+    
     TYPE = None
 
     def __repr__(self):
@@ -20,7 +20,7 @@ class Rating:
 
 class RatingDiscrete(Rating):
 
-    def __init__(self, values : dict[str, str], id : str = None):
+    def __init__(self, values : dict[int, str], id : str = None):
         super().__init__(id)
         self.scale = sorted((int(k), str(v)) for k, v in values.items())
     
@@ -31,11 +31,28 @@ class RatingDiscrete(Rating):
         scale = [f'{k}:"{v}"' for k, v in self.scale]
         return f"RatingDiscrete {id}(values=({', '.join(scale)}))"
 
+    def __str__(self):
+        return repr(self)
+
+    def value_label(self, val: int) -> str:
+        """ returns the label of the value, if not found, returns None """
+        for k, v in self.scale:
+            if k == val:
+                return v
+        return None
+
+    def label_value(self, label: str) -> int:
+        """ returns the value of the label, if not found, returns None """
+        for k, v in self.scale:
+            if v == label:
+                return k
+        return None
+
 class RatingContinuous(Rating):
     
-    def __init__(self, minval : int, maxval : int, step : int, id : str = None):
+    def __init__(self, minval : int, maxval : int, id : str = None):
         super().__init__(id)
-        self.minval, self.maxval, self.step = int(minval), int(maxval), int(step)
+        self.minval, self.maxval = int(minval), int(maxval)
         if self.minval > self.maxval:
             raise ValueError(f"min rating ({self.minval}) is greater than max ({self.maxval})")
 
@@ -43,7 +60,10 @@ class RatingContinuous(Rating):
 
     def __repr__(self):
         id = "" if self.id is None else str(self.id)
-        return f"RatingContinuous {id}(min={self.minval}, max={self.maxval}, step={self.step})"
+        return f"RatingContinuous {id}(min={self.minval}, max={self.maxval})"
+
+    def __str__(self):
+        return repr(self)
 
 def parseRating(data : dict, id = None) -> Rating:
     """ parses a rating from the data json format into Rating object, returns None if invalid """
@@ -66,8 +86,7 @@ def parseRating(data : dict, id = None) -> Rating:
         try:
             minval = data["min"]
             maxval = data["max"]
-            step = data["step"]
-            return RatingContinuous(minval, maxval, step, id)
+            return RatingContinuous(minval, maxval, id)
         except (KeyError, TypeError, ValueError):
             logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
             return None
@@ -102,7 +121,6 @@ def saveRatings(ratings : dict[str, Rating]) -> dict:
             rat_dict = {}
             rat_dict["min"] = rat.minval
             rat_dict["max"] = rat.maxval
-            rat_dict["step"] = rat.step
 
         elif isinstance(rat, RatingDiscrete):
             rat_dict = {str(k): v for k, v in rat.scale}

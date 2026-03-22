@@ -6,9 +6,7 @@ from PyQt6.QtWidgets import QStyle
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 
 from ..Samples import Sample
-from ..Questions import Question, Rating
-
-from .LabeledSlider import LabeledSlider
+from ..Questions import Question, RatingDiscrete, RatingContinuous, Rating
 
 class SampleWidget(QWidget):
     def __init__(self, sample : Sample):
@@ -24,30 +22,6 @@ class SampleWidget(QWidget):
         layout.addWidget(play_button)
 
         self.setLayout(layout)
-
-class RatingWidget(QWidget):
-    def __init__(self, minimum=0, maximum=100, step = 1):
-        super().__init__()
-
-        #self.rating = rating
-
-        layout = QHBoxLayout()
-
-        slider = LabeledSlider(minimum, maximum, step)
-        slider.setMaximumWidth(900)  # slider won't grow past 300px
-
-        value_field = QLineEdit()
-        value_field.setReadOnly(True)
-        value_field.setText(str(slider.value()))
-        value_field.setFixedWidth(80)  # fixed width 80px
-
-        slider.valueChanged.connect(lambda v: value_field.setText(str(v)))
-
-        layout.addWidget(slider)
-        layout.addWidget(value_field)
-
-        self.setLayout(layout)
-
 
 
 class QuestionWidget(QWidget):
