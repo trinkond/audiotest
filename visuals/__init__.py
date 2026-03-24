@@ -1,8 +1,8 @@
 
 
-from .Ratings import LabeledSlider, RatingWidget
-from .Samples import SampleWidget
+#from .RatingWidget import LabeledSlider, RatingWidget
+#from .SampleWidget import SampleWidget
 
 
-__all__ = ["LabeledSlider", "SampleWidget", "RatingWidget"]
+#__all__ = ["LabeledSlider", "SampleWidget", "RatingWidget"]
 

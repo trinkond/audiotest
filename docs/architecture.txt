@@ -1,0 +1,5 @@
+4 parts
+Model - immutable, only loaded in test mode
+GUI - takes the model and builds itself based on that, interacts with the user and the player
+Player - takes commands from gui and does its job
+ResultCollector - receives signals from GUI and collects them. Created upon Model loading and storing with it

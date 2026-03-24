@@ -1,8 +1,8 @@
 """ Testing of my classes Rating in package visuals """
 
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QLabel
-from ..visuals.Ratings import RatingWidget, LabeledSlider
-from ..Questions import RatingContinuous, RatingDiscrete
+from ..visuals.RatingWidget import RatingWidget, LabeledSlider
+from ..structure.Rating import RatingContinuous, RatingDiscrete
 import sys
 
 """ Just a dummy widget to showcase the slider supporting float values """

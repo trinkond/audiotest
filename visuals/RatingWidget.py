@@ -1,12 +1,11 @@
 # Written by Ondrej Trinkewitz
-# Holds the object widgets for the visual user interface
+# Contains the visual part for the Rating class
 
 from PyQt6.QtWidgets import QWidget, QStyle, QLabel, QSlider, QHBoxLayout, QLineEdit, QButtonGroup, QRadioButton, QStyleOptionSlider
 from PyQt6.QtGui import QPainter, QColor
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 
-from ..Samples import Sample
-from ..Questions import Question, RatingDiscrete, RatingContinuous, Rating
+from ..structure.Rating import RatingDiscrete, RatingContinuous, Rating
 
 import math
 
