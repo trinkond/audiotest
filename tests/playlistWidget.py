@@ -27,8 +27,7 @@ layout.addWidget(PlaylistWidget(playlist))
 
 window.setLayout(layout)
 
-
-# Load the QSS stylessheet and apply BEFORE creating widgets
+# Load the QSS stylessheet
 with open("audiotest/visuals/style.qss", "r") as f:
     app.setStyleSheet(f.read())
 
