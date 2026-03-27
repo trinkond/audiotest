@@ -7,7 +7,7 @@ from ..Player import Player
 class SampleWidget(QWidget):
     """ A widget representing a sample that can be played, with a play controls and a label """
 
-    requestPlayback = pyqtSignal(object)
+    requestPlayback = pyqtSignal(Sample)
     requestStop = pyqtSignal()
 
     def __init__(self, sample : Sample, parent=None):
@@ -31,7 +31,7 @@ class SampleWidget(QWidget):
 
     def buttonClicked(self, state):
         if not self.playing:
-            self.requestPlayback.emit(self)
+            self.requestPlayback.emit(self.sample)
         else:
             self.requestStop.emit()
 

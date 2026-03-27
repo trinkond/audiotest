@@ -1,6 +1,7 @@
 
 from PyQt6.QtCore import QObject, pyqtSignal
 from ..visuals.SampleWidget import SampleWidget
+from ..structure.Sample import Sample
 from ..Player import Player
 
 class PlaybackControl(QObject):
@@ -8,7 +9,7 @@ class PlaybackControl(QObject):
     def __init__(self, player : Player):
         super().__init__()
         self.player = player
-        self.currentSample = None
+        self.playingWidget = None
 
         player.finished.connect(self.playbackStop)
 
@@ -23,17 +24,16 @@ class PlaybackControl(QObject):
         for child in obj.findChildren(QObject):
             self.registerSamplesRecursive(child)
 
-    def playbackStart(self, widget : SampleWidget):
-        sample = widget.sample
+    def playbackStart(self, sample : Sample):
         if not self.player.playing():           # if the player is free, start playback
             self.player.playSample(sample)
-            widget.setPlaying()
-            self.currentSample = widget
+            self.playingWidget = self.sender()
+            self.playingWidget.setPlaying()
 
     def playbackStop(self):
         self.player.stop()
-        if self.currentSample is not None:
-            self.currentSample.setStopped()
-        self.currentSample = None
+        if self.playingWidget is not None:
+            self.playingWidget.setStopped()
+        self.playingWidget = None
 
 
