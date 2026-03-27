@@ -27,7 +27,11 @@ class PlaylistWidget(QScrollArea):
         layout.setSpacing(4)
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
+        first = True
         for item in self.itemWidgets:
+            if first:
+                item.setOpened()
+                first = False
             layout.addWidget(item)
             item.expanded.connect(self.itemOpened)
 
@@ -38,4 +42,33 @@ class PlaylistWidget(QScrollArea):
         for item in self.itemWidgets:
             if item is not expandedItem:
                 item.setClosed()
+
+class ExpandableListWidget(QScrollArea):
+    """  A widget to represent a list of items, is scrollable if needed, each item can be expanded"""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.setWidgetResizable(True)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+
+        self.container = QWidget()
+        self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(4)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        self.container.setLayout(self.layout)
+        self.setWidget(self.container)
+
+    def addItem(item : ItemWidget):
+        self.layout.addWidget(item)
+        item.expanded.connect(self.itemOpened)
+
+
+    def itemOpened(self, expandedItem):
+        for item in self.itemWidgets:
+            if item is not expandedItem:
+                item.setClosed()
+
 

@@ -4,8 +4,10 @@
 import requests
 import time
 import logging
+
 from audiomath import SystemVolume
-from Samples import Region, Sample
+from .structure.Sample import Region, Sample
+from PyQt6.QtCore import pyqtSignal, QObject, QTimer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -74,10 +76,13 @@ class ReaperAPI:
     Next_marker = "40173"
     Prev_marker = "40172"
 
-class Player:
+class Player(QObject):
     """ Audio player interface for playing tracks using Reaper """
 
+    finished = pyqtSignal()
+
     def __init__(self, volume : float = 1.0):
+        super().__init__()
         self.track = 0
         self.region = None
         self.playback_started = 0.0
@@ -94,6 +99,10 @@ class Player:
             self.reaper.Unsolo_all,
         )
 
+        self.timer = QTimer()
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.finished.emit)
+
     def playTrack(self, track : int, region : Region):
         if not track in range(1, self.reaper.n_tracks+1):
             raise PlaybackError(f"There is no track with number {track}")
@@ -109,22 +118,17 @@ class Player:
         self.playback_stopped = False
         self.region = region
         self.track = track
+        self.timer.start(int((region.duration + self.REAPER_DELAY) * 1000))
 
     def playSample(self, sample : Sample):
-        playTrack(sample.track, sample.region)
+        self.playTrack(sample.track, sample.region)
 
     def stop(self):
         self.reaper.command(self.reaper.Stop)
-        self.playback_stopped = True
+        self.timer.stop()
 
     def playing(self) -> bool:
-        if self.playback_stopped:
-            return False
-        playback_end = self.playback_started + self.regions[self.region].duration
-        playback_end += self.REAPER_DELAY
-        if time.perf_counter() > playback_end:
-            return False
-        return True
+        return self.timer.isActive()
 
     def setVolume(self, volume : float):
         self.volume = volume
