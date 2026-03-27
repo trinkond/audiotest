@@ -5,15 +5,29 @@ from PyQt6.QtWidgets import QWidget, QStyle, QLabel, QSlider, QHBoxLayout, QLine
 from PyQt6.QtGui import QPainter, QColor
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 
-from ..structure.Rating import RatingDiscrete, RatingContinuous, Rating
+from ..structure.Rating import RatingDiscrete, RatingContinuous, Rating, Value
 
 import math
 
-class LabeledSlider(QWidget):
+class Scale(QWidget):
+    """ Abstract class for a rating scale """
+
+    valueChanged = pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def value(self) -> int:
+        # Returns the current value
+        raise NotImplementedError(f"Class {self.__class__} doesn't implement a function for reading the value")
+
+    def setValue(self, val : int):
+        # Map external value to internal slider
+        raise NotImplementedError(f"Class {self.__class__} doesn't allo654w to set a value")
+
+class LabeledSlider(Scale):
     """ Slider that supports float values and a custom step,
     renders with automatic labels underneath the slider """
-    
-    valueChanged = pyqtSignal(object)
     
     def __init__(self, minimum, maximum, step, parent=None):
         
@@ -59,12 +73,10 @@ class LabeledSlider(QWidget):
         return right - left
 
     def value(self):
-        # Returns the current value
         val = self.slider.value()
         return self.minval + self.step * val
 
     def setValue(self, val):
-        # Map external value to internal slider
         val = max(min(val, self.maxval), self.minval)   # clamp the value to the slider range
         val = (val - self.minval) / self.step
         self.slider.setValue(int(round(val)))
@@ -155,10 +167,8 @@ class LabeledSlider(QWidget):
                 label
             )
 
-class ButtonRow(QWidget):
+class ButtonRow(Scale):
     """ A row of check buttons with labels, one can be selected at a time. """
-    
-    optionChanged = pyqtSignal(object)
     
     def __init__(self, options: list[tuple[int, str]], parent=None):
         
@@ -176,17 +186,18 @@ class ButtonRow(QWidget):
             layout.addWidget(btn)
 
         # on button press emit signal with the new value
-        self.group.buttonClicked.connect(lambda idx: self.optionChanged.emit(self.value()))
+        self.group.buttonClicked.connect(lambda idx: self.valueChanged.emit(self.value()))
 
         self.setLayout(layout)
 
     def value(self):
-        # Returns the current value
         return self.group.checkedId()
 
     def setValue(self, val):
-        # Map external value to the button
-        self.group.button(val).setChecked(True)
+        try:
+            self.group.button(val).setChecked(True)
+        except AttributeError:
+            pass
 
     def sizeHint(self):
         original = super().sizeHint()
@@ -195,58 +206,46 @@ class ButtonRow(QWidget):
 class RatingWidget(QWidget):
     """ Widget for displaying a rating, supports both discrete and continuous ratings
     contains a slider or a row of buttons as input and a text field for diplay """
-    def __init__(self, rating : Rating, parent=None, text_editable=True):
+
+    ratingChanged = pyqtSignal(Value)  # signal a rating change
+
+    def __init__(self, rating : Rating, parent=None, textEditable=True):
         super().__init__(parent)
 
         self.rating = rating
-        self.type = rating.TYPE
 
-        self.value_field = QLineEdit()
-        self.value_field.setReadOnly(not text_editable)
-        self.value_field.setFixedWidth(80)  # fixed width 80px
+        self.valueField = QLineEdit()
+        self.valueField.setReadOnly(not textEditable)
+        self.valueField.setFixedWidth(80)  # fixed width 80px
 
-        if self.type == RatingContinuous.TYPE:
+        if type(self.rating) == RatingContinuous:
             self.scale = LabeledSlider(int(rating.minval), int(rating.maxval), step=1)
-            self.value_field.setText(str(self.scale.value()))
-            
-            def update_slider(text):
-                try:
-                    if text:
-                        self.scale.setValue(int(text))
-                except ValueError:
-                    pass
-
-            self.scale.valueChanged.connect(lambda val: self.value_field.setText(str(val)))
-            self.value_field.textChanged.connect(update_slider)
-            self.value_field.editingFinished.connect(lambda: self.value_field.setText(str(self.scale.value())))
-
-        elif self.type == RatingDiscrete.TYPE:
+        elif type(self.rating) == RatingDiscrete:
             self.scale = ButtonRow(rating.scale)
-            self.value_field.setText(str(self.scale.value()))
-
-            def update_label(val):
-                text = self.rating.value_label(val)
-                self.value_field.setText(text if text is not None else "")
-
-            def update_buttons(val: str):
-                try:
-                    val = int(val)
-                    self.scale.setValue(val)
-                except (KeyError, ValueError, AttributeError):
-                    pass
-
-            self.scale.optionChanged.connect(update_label)
-            self.value_field.textChanged.connect(update_buttons)
-            self.value_field.editingFinished.connect(lambda: update_label(self.scale.value()))
-
-            update_label(self.scale.value())
-
         else:
-            raise ValueError(f"Invalid rating type {self.type}")
-        
+            raise TypeError(f"Invalid rating type {self.type}")
+
         layout = QHBoxLayout()
         self.scale.setMaximumWidth(900)  # scale won't grow past 900px
         layout.addWidget(self.scale)
-        layout.addWidget(self.value_field)
+        layout.addWidget(self.valueField)
 
         self.setLayout(layout)
+
+        self.scale.valueChanged.connect(self.valueUpdate)
+        if textEditable:
+            self.valueField.textChanged.connect(self.parseLabel)
+            self.valueField.editingFinished.connect(lambda: self.valueUpdate(self.scale.value()))
+
+    def parseLabel(self, text):
+        """ If the label is editted as text """
+        try:
+            self.scale.setValue(int(text))
+        except (TypeError, ValueError):
+            pass
+
+    def valueUpdate(self, val):
+        """ Update the label shown and send a signal about the change """
+        val = Value(self.rating, val)   # pack the raw int into a Value object
+        self.ratingChanged.emit(val)
+        self.valueField.setText(str(val))

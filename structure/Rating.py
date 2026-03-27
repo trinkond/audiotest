@@ -2,10 +2,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Rating:
-    """ Class representing a rating scale """
+    """ Abstract parent class for representing a rating scale """
     def __init__(self, id : str = None):
         self.id = id
-    
+
     TYPE = None
 
     def __repr__(self):
@@ -14,6 +14,26 @@ class Rating:
 
     def __str__(self):
         return repr(self)
+
+class Value:
+    """ Storing information about the value and the rating type """
+    def __init__(self, rating : Rating, val : int):
+        self.rating = rating
+        self.value = val
+    
+    def __str__(self):
+        """ Return the text representation of the rating value """
+        if type(self.rating) == RatingContinuous:
+            return str(self.value)
+
+        elif type(self.rating) == RatingDiscrete:
+            for val, label in self.rating.scale:
+                if val == self.value:
+                    return label
+            return ""
+
+        else:
+            return "UNKNOWN Rating type"
 
 class RatingDiscrete(Rating):
 
@@ -30,20 +50,6 @@ class RatingDiscrete(Rating):
 
     def __str__(self):
         return repr(self)
-
-    def value_label(self, val: int) -> str:
-        """ returns the label of the value, if not found, returns None """
-        for k, v in self.scale:
-            if k == val:
-                return v
-        return None
-
-    def label_value(self, label: str) -> int:
-        """ returns the value of the label, if not found, returns None """
-        for k, v in self.scale:
-            if v == label:
-                return k
-        return None
 
 class RatingContinuous(Rating):
     
