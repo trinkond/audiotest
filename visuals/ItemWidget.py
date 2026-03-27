@@ -5,6 +5,7 @@ from .SampleWidget import SampleWidget
 from .QuestionWidget import QuestionWidget
 from ..structure.Sample import Sample
 from ..structure.Question import Question
+from ..structure.Rating import Value
 
 class ClickWatcher(QObject):
     """ Listens for clicks on a widget including its children and emits a signal when that happens """
@@ -35,14 +36,19 @@ class ClickWatcher(QObject):
 class ItemWidget(QWidget):
     """ A widget representing an item containing a sample to be played and a list of questions to be filed """
     
-    expanded = pyqtSignal(object)   # emits itself when clicked and expanded
+    expanded = pyqtSignal(object)                       # emits itself when clicked and expanded
+                           # value, itemID, questionID  # emit the rating change to for result collection
+    ratingChanged = pyqtSignal(Value, int, int)
 
-    def __init__(self, sample : Sample, instructions : str, questions : list[Question], parent=None, expanded=False):
+    def __init__(self, sample : Sample, instructions : str, questions : list[Question], id : int = 0, parent=None, expanded=False):
         super().__init__(parent)
+        self.id = id
 
         self.instructWidget = QLabel(instructions)
         self.sampleWidget = SampleWidget(sample)
-        self.questWidgets = [QuestionWidget(question) for question in questions]
+        self.questWidgets = []
+        for i, quest in enumerate(questions):
+            self.questWidgets.append(QuestionWidget(quest, i))
 
         self.opened = expanded      # track whether item is in expanded or summary view
         
@@ -63,6 +69,7 @@ class ItemWidget(QWidget):
         body_layout.addWidget(self.instructWidget)
         for quest in self.questWidgets:
             body_layout.addWidget(quest)
+            quest.ratingChanged.connect(lambda val, quest: self.ratingChanged.emit(val, self.id, quest))
         body_layout.setContentsMargins(0, 0, 0, 0)      # leave only main layout margins
 
         layout = QVBoxLayout()
@@ -97,5 +104,5 @@ class ItemWidget(QWidget):
         """ Expands the item, if the header gets clicked """
         if not self.opened:
             self.setOpened()
-            self.expanded.emit(self)    # notify the player about the expansion
+            self.expanded.emit(self)    # notify other widgetsabout the expansion
 

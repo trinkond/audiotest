@@ -15,7 +15,10 @@ class PlaylistWidget(QScrollArea):
         super().__init__(parent)
 
         self.playlist = playlist   # reference to the playlist
-        self.itemWidgets = [ItemWidget(sample, playlist.instructions, playlist.questions) for sample in playlist.samples]
+        self.itemWidgets = []
+        for i, sample in enumerate(playlist.samples):
+            item = ItemWidget(sample, playlist.instructions, playlist.questions, id=i)
+            self.itemWidgets.append(item)
 
         self.setWidgetResizable(True)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)

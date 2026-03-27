@@ -5,6 +5,8 @@ from ..structure.Sample import Sample
 from ..Player import Player
 
 class PlaybackControl(QObject):
+    """ Class holding the playback logic
+    Connects to SampleWidget signals and runs the samples using the Player """
 
     def __init__(self, player : Player):
         super().__init__()
