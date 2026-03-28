@@ -23,9 +23,10 @@ class ResultCollector(QObject):
         for child in obj.findChildren(QObject):
             self.registerItemsRecursive(child)
 
-    def ratingCollect(self, val : Value, sample : int, question : int):
-        self.ratingList[(sample, question)] = val
-        print(f"Received a rating {val.value} from sample {sample} and question {question}")
+    def ratingCollect(self, val : Value, source : tuple[int, int, int]):
+        playlist, sample, question = source
+        self.ratingList[(playlist, sample, question)] = val
+        print(f"Received a rating {val.value} from {source}")
 
 
 

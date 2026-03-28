@@ -18,8 +18,17 @@ class Playlist:
         self.name = name
 
     def __repr__(self):
-        name = "" if self.name is None else str(self.name)
-        return f'Playlist {name}(samples={self.samples}, instructions="{self.instructions}", questions={self.questions})'
+        name = "" if self.name is None else " " + str(self.name)
+        ret = f"Playlist{name}:\n"
+        ret += "  Samples:\n"
+        for sample in self.samples:
+            ret += "    " + str(sample) + "\n"
+        ret += "  Instructions:\n"
+        ret += "    " + str(self.instructions) + "\n"
+        ret += "  Questions:\n"
+        for quest in self.questions:
+            ret += "    " + str(quest) + "\n"
+        return ret
 
     def __str__(self):
         return repr(self)
@@ -53,7 +62,7 @@ class Playlist:
         for s in samps:
             try:
                 s = samples[s]
-            except KeyError:
+            except (KeyError, TypeError):
                 logger.warning(f'Sample {s} needed by Playlist {name or ""}not found')
                 s = None
             osamps.append(s)
@@ -80,6 +89,7 @@ def parsePlaylists(data : list, samples : dict[str : Sample], questions : dict[s
     """ parses a list loaded from json into a list of Playlists """
     logger.info("Parsing playlists")
     plays = []
+    cc = 0
     for val in data:
         pl = Playlist.fromDict(val, samples, questions)
         if pl is not None:

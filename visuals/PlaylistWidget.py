@@ -8,16 +8,15 @@ from .SampleWidget import SampleWidget
 from .QuestionWidget import QuestionWidget
 from .ItemWidget import ItemWidget
 
-
 class PlaylistWidget(QScrollArea):
     """  A widget to represent a playlist of items (samples with questions) """
-    def __init__(self, playlist : Playlist, parent=None):
+    def __init__(self, playlist : Playlist, id : int = 0, parent=None):
         super().__init__(parent)
 
         self.playlist = playlist   # reference to the playlist
         self.itemWidgets = []
         for i, sample in enumerate(playlist.samples):
-            item = ItemWidget(sample, playlist.instructions, playlist.questions, id=i)
+            item = ItemWidget(sample, playlist.instructions, playlist.questions, id=i, playlist=id)
             self.itemWidgets.append(item)
 
         self.setWidgetResizable(True)
