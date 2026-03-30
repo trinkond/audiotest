@@ -6,7 +6,7 @@ from ..structure.Rating import Value
 
 class ResultCollector(QObject):
     """ Collects the ratings inputted by the user
-    Connects to the signals of ItemWidget, that yield the rating, sorts and keeps them """
+    Connects to the signals of ItemWidget, that yields the rating, sorts and keeps it """
 
     def __init__(self):
         super().__init__()

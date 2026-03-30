@@ -6,14 +6,10 @@ from ..structure.Playlist import Playlist
 from ..structure.Sample import Sample
 from ..structure.Question import Question
 from ..structure.Rating import RatingDiscrete, RatingContinuous, Rating
-from ..visuals.PlaylistWidget import PlaylistWidget
+from ..structure.Test import Test
+from ..visuals.Window import Window
 
 app = QApplication(sys.argv)
-
-window = QWidget()
-window.setWindowTitle("Rating test")
-
-layout = QVBoxLayout()
 
 instructions = "Do something productive to test this thing!"
 samples = [Sample(1, None), Sample(2, None), Sample(3, None)]
@@ -23,14 +19,14 @@ questions = [
     ]
 playlist = Playlist(samples, instructions, questions)
 
-layout.addWidget(PlaylistWidget(playlist))
+test = Test({}, {}, {}, {}, [playlist])
 
-window.setLayout(layout)
+window = Window(test)
+window.setWindowTitle("Rating test")
 
 # Load the QSS stylessheet
 with open("audiotest/visuals/style.qss", "r") as f:
     app.setStyleSheet(f.read())
-
 
 window.show()
 
