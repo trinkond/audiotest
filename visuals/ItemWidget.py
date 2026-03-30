@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QGridLayout
 from PyQt6.QtCore import pyqtSignal, QObject, QEvent, Qt
 
 from .SampleWidget import SampleWidget
@@ -53,10 +53,15 @@ class ItemWidget(QWidget):
 
         self.opened = expanded      # track whether item is in expanded or summary view
         
+        self.rating_scores = []
         self.rating_summary = QWidget()
-        rating_layout = QHBoxLayout(self.rating_summary)
+        rating_layout = QGridLayout(self.rating_summary)
         for i, quest in enumerate(self.questWidgets):
-            rating_layout.addWidget(QLabel(str(f"Q{i+1}")))
+            label = QLabel(str(f"Question {i+1}:"))
+            score = QLabel("")
+            rating_layout.addWidget(label, 0, 2*i)
+            rating_layout.addWidget(score, 0, 2*i+1)
+            self.rating_scores.append(score)
 
         self.header = QWidget()
         header_layout = QHBoxLayout(self.header)
@@ -70,7 +75,7 @@ class ItemWidget(QWidget):
         body_layout.addWidget(self.instructWidget)
         for quest in self.questWidgets:
             body_layout.addWidget(quest)
-            quest.ratingChanged.connect(lambda val, quest: self.ratingChanged.emit(val, (self.pl, self.id, quest)))
+            quest.ratingChanged.connect(self.ratingUpdate)
         body_layout.setContentsMargins(0, 0, 0, 0)      # leave only main layout margins
 
         layout = QVBoxLayout()
@@ -107,3 +112,7 @@ class ItemWidget(QWidget):
             self.setOpened()
             self.expanded.emit(self)    # notify other widgetsabout the expansion
 
+    def ratingUpdate(self, val, quest):
+        self.ratingChanged.emit(val, (self.pl, self.id, quest))     # emit the rating change higher
+        score = self.rating_scores[quest]
+        score.setText(str(val))                                     # update the label in the summary
