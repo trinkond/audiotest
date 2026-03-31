@@ -87,6 +87,11 @@ class Test:
 def loadTest(fname : str) -> Test:
     """ Reads the .json configuration file of a test """
 
+    if not fname.endswith('.json'):
+        logger.warning(f'Loading test configuration from a non-json file "{fname}"')
+    else:
+        logger.info(f'Loading test configuration from "{fname}"')
+
     try:
         with open(fname, "r", encoding="utf-8") as f:
             data = json.load(f)

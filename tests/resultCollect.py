@@ -1,17 +1,18 @@
 """ Testing of the ResultCollector and ItemWidget communication """
 
-import sys
+import sys, os
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 
 from ..structure.Sample import Sample
 from ..structure.Rating import Rating, RatingContinuous, RatingDiscrete
 from ..structure.Question import Question
 from ..structure.Playlist import Playlist
-from ..visuals.PlaylistWidget import PlaylistWidget
+from ..structure.Test import Test
+from ..visuals.ItemWidget import ItemWidget
+from ..visuals.TestWidget import TestWidget
 from ..logic.ResultCollector import ResultCollector
 
-
-rescol = ResultCollector()
+filename = "audiotest/tests/test_results.csv"
 
 app = QApplication(sys.argv)
 
@@ -21,7 +22,7 @@ window.setWindowTitle("Result collection test")
 layout = QVBoxLayout()
 
 samples = [
-    Sample(1, None),
+    Sample(1, None, "My favorite song"),
     Sample(2, None),
     Sample(3, None)
 ]
@@ -35,9 +36,12 @@ quests = [
     Question("Was the volume ok?", rat1)
 ]
 
-playlist = Playlist(samples, "Listen to the sample and answer all the questions", quests)
+playlist = Playlist(samples, "Listen to the sample and answer all the questions", quests, name="God playlist")
+test = Test({}, {}, {}, {}, [playlist])
 
-layout.addWidget(PlaylistWidget(playlist))
+rescol = ResultCollector(test, metadata="Test,User")
+
+layout.addWidget(TestWidget(test))
 
 window.setLayout(layout)
 
@@ -49,4 +53,14 @@ with open("audiotest/visuals/style.qss", "r") as f:
 
 window.show()
 
-sys.exit(app.exec())
+ret = app.exec()
+
+if ret == 0:
+    try:
+        os.remove(filename)         # delete the file to test header writing
+    except FileNotFoundError:
+        pass
+    rescol.saveResults(filename)    # save the results for the first time
+    rescol.saveResults(filename)    # save the results again to test appending to an existing file
+
+sys.exit(ret)
