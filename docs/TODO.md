@@ -1,23 +1,25 @@
 What needs to be done
 
-[ ] Playback
+[x] Playback
     [x] Communication with Reaper (over http, inspire/copy from Tomas Dudacek)
-    [x] Reaper setup structure - see audio_preparation_guide.txt
-    [x] The Player class able to start/stop correct samples
-    [ ] Signal connection to UI buttons
-[ ] User interface
-    [x] Choose the library - QT6
-    [x] Rating input elements (LabeledSlider, ButtonRow)
-    [ ] Sample widget allowing playback communicating with the Player
-    [ ] Signal connection to the data collection
+    [x] Reaper setup guide - see audio_preparation_guide.txt
+    [x] Player class - abstraction of a player, able to play samples
+    [x] Connection to the UI buttons - class PlaybackControl
+[x] User interface
+    [x] Choose the library - PyQt6
+    [x] Rating input elemnts - LabeledSlider, ButtonRow, RatingWidget
+    [x] Sample widget allowing start/stop playback of the correct sample - SampleWidget
+    [x] The structure of the test widow - ItemWidget, QuestionWidget, Window
+    [x] Signal connection to allowing the collection of results - pyqtSignal ItemWidget.ratingChanged
 [ ] Collection of the results
-    [ ] Choose the saving format
-    [ ] Create a class accepting UI signals and collecting results
-[ ] Test settings saving/loading (json/xml)
+    [ ] Choose the saving filetype
+    [x] Class accepting UI signals and collecting results - RatingCollector
+    [ ] Design the result storing format
+[ ] The test logic and global settings
+[x] Test settings saving/loading (json/xml)
     [x] Plan the overall structure - sample_settings.json
     [x] Code the parsers & savers for all the objects
-    [ ] Finish the DataLoader class
-[ ] Setting editor
+[ ] Settings editor
 
 
 
