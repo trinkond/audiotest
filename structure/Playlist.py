@@ -18,7 +18,7 @@ class Playlist:
         self.name = name
 
     def __repr__(self):
-        name = "" if self.name is None else " " + str(self.name)
+        name = "" if self.name is None else f' "{self.name}"'
         ret = f"Playlist{name}:\n"
         ret += "  Samples:\n"
         for sample in self.samples:
@@ -49,21 +49,21 @@ class Playlist:
         try:
             instructs = str(data["instructions"])
         except (KeyError, TypeError, ValueError):
-            logger.warning(f'Failed to parse the instructions for the playlist {name or ""}')
+            logger.warning(f'Failed to parse the instructions for the playlist "{name}"')
             instructs = None
         try:
             samps = data["samples"]
             if type(samps) != list:
                 raise TypeError()     
         except (KeyError, TypeError, ValueError):
-            logger.warning(f'Failed to parse playlist {name or ""}, missing or invalid "samples" entry')
+            logger.warning(f'Failed to parse playlist "{name}", missing or invalid "samples" entry')
             samps = []
         osamps = []
         for s in samps:
             try:
                 s = samples[s]
             except (KeyError, TypeError):
-                logger.warning(f'Sample {s} needed by Playlist {name or ""}not found')
+                logger.warning(f'Sample {s} needed by Playlist "{name}" not found')
                 s = None
             osamps.append(s)
         samps = osamps
@@ -72,14 +72,14 @@ class Playlist:
             if type(quests) != list:
                 raise TypeError()
         except (KeyError, TypeError, ValueError):
-            logger.warning(f'Failed to parse playlist{name or ""}, missing or invalid "questions"')
+            logger.warning(f'Failed to parse playlist "{name}", missing or invalid "questions" entry')
             quests = []
         oquests = []
         for q in quests:
             try:
                 q = questions[q]
             except KeyError:
-                logger.warning(f'Question {q} needed by Playlist {name or ""}not found')
+                logger.warning(f'Question {q} needed by Playlist "{name}" not found')
                 q = None
             oquests.append(q)
         quests = oquests

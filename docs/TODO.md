@@ -11,10 +11,10 @@ What needs to be done
     [x] Sample widget allowing start/stop playback of the correct sample - SampleWidget
     [x] The structure of the test widow - ItemWidget, QuestionWidget, Window
     [x] Signal connection to allowing the collection of results - pyqtSignal ItemWidget.ratingChanged
-[ ] Collection of the results
-    [ ] Choose the saving filetype
+[x] Collection of the results
+    [x] Choose the saving filetype - .csv
     [x] Class accepting UI signals and collecting results - RatingCollector
-    [ ] Design the result storing format
+    [x] Design the result storing format - test_results.csv
 [ ] The test logic and global settings
 [x] Test settings saving/loading (json/xml)
     [x] Plan the overall structure - sample_settings.json
