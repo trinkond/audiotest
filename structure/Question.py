@@ -59,7 +59,7 @@ def saveQuestions(questions : dict[str, Question]) -> dict:
     """ formats the Samples as a dict for saving into json """
     logger.info("Saving questions")
     data = {}
-    for qst in quesions.values():
+    for qst in questions.values():
         qst_dict = {}
         qst_dict["text"] = qst.text
         qst_dict["rating"] = qst.rating.id

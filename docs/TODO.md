@@ -16,10 +16,16 @@ What needs to be done
     [x] Class accepting UI signals and collecting results - RatingCollector
     [x] Design the result storing format - test_results.csv
 [ ] The test logic and global settings
-[x] Test settings saving/loading (json/xml)
+[ ] Test settings saving/loading (json/xml)
     [x] Plan the overall structure - sample_settings.json
     [x] Code the parsers & savers for all the objects
+    [ ] Language things
 [ ] Settings editor
+
+
+[ ] Fixes
+    [ ] Separate Reaper initiation from the Player
+    [ ] Connect the Finish Test button
 
 
 

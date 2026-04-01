@@ -112,6 +112,6 @@ def savePlaylists(playlists : list[Playlist]) -> list:
         if pl.reorder:
             pl_dict["reorder"] = True
         pl_dict["instructions"] = pl.instructions
-        pl_dict["questions"] = [q.id for q in pl.quesions]
+        pl_dict["questions"] = [q.id for q in pl.questions]
         data.append(pl_dict)
     return data
