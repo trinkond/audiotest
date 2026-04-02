@@ -11,9 +11,9 @@ class Playlist:
     Each playlist contains multiple Samples and
     a set of instructions and questions that are asked for each of the samples """
     def __init__(self, samples : list[Sample], instructions : str, questions : list[Question], reorder=False, name : str = None):
-        self.samples = list(samples)
-        self.instructions = str(instructions)
-        self.questions = list(questions)
+        self.samples = samples
+        self.instructions = instructions
+        self.questions = questions
         self.reorder = reorder
         self.name = name
 
@@ -47,7 +47,9 @@ class Playlist:
         except (KeyError, TypeError, ValueError):
             reorder = False
         try:
-            instructs = str(data["instructions"])
+            instructs = data["instructions"]
+            if instructs is not None:
+                instructs = str(instructs)
         except (KeyError, TypeError, ValueError):
             logger.warning(f'Playlist "{name}" has no instructions')
             instructs = None

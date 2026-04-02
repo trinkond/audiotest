@@ -45,7 +45,7 @@ class ItemWidget(QWidget):
         self.id = id
         self.pl = playlist
 
-        self.instructWidget = QLabel(instructions)
+        self.instructWidget = QLabel(instructions) if instructions else None
         self.sampleWidget = SampleWidget(sample)
         self.questWidgets = []
         for i, quest in enumerate(questions):
@@ -72,7 +72,8 @@ class ItemWidget(QWidget):
 
         self.body = QWidget()
         body_layout = QVBoxLayout(self.body)
-        body_layout.addWidget(self.instructWidget)
+        if self.instructWidget:
+            body_layout.addWidget(self.instructWidget)
         for quest in self.questWidgets:
             body_layout.addWidget(quest)
             quest.ratingChanged.connect(self.ratingUpdate)
