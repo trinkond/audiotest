@@ -5,9 +5,12 @@ from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 from ..structure.Sample import Sample, Region
 from ..visuals.SampleWidget import SampleWidget
 from ..logic.PlaybackControl import PlaybackControl
-from ..Player import Player
+from ..player.Player import Player
 
 player = Player()
+if not player.initReaper():
+    print("Failed to connect to Reaper, exiting")
+    sys.exit(1)
 control = PlaybackControl(player)
 
 app = QApplication(sys.argv)

@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPushButt
 from PyQt6.QtCore import pyqtSignal
 
 from ..structure.Sample import Sample
-from ..Player import Player
+from ..player.Player import Player
 
 class SampleWidget(QWidget):
     """ A widget representing a sample that can be played, with a play controls and a label """

@@ -2,7 +2,7 @@
 from PyQt6.QtCore import QObject, pyqtSignal
 from ..visuals.SampleWidget import SampleWidget
 from ..structure.Sample import Sample
-from ..Player import Player
+from ..player.Player import Player
 
 class PlaybackControl(QObject):
     """ Class holding the playback logic
