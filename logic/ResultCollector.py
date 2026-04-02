@@ -87,13 +87,13 @@ class ResultStructure():
             loadedPlaylist, loadedSample, loadedQuestion = loaded
 
             if myPlaylist.strip().lower() != loadedPlaylist.strip().lower():
-                logger.warning(f'Format mismatch: Loaded playlist "{loadedPlaylist}" doesn\'t match test playlist "{myPlaylist}"')
+                logger.warning(f'Format of the results is invalid: Playlist "{loadedPlaylist}" doesn\'t match test playlist "{myPlaylist}"')
                 return False
             if mySample.strip().lower() != loadedSample.strip().lower():
-                logger.warning(f'Format mismatch: Loaded sample "{loadedSample}" doesn\'t match test sample "{mySample}"')
+                logger.warning(f'Format of the results is invalid: Sample "{loadedSample}" doesn\'t match test sample "{mySample}"')
                 return False
             if myQuestion.strip().lower() != loadedQuestion.strip().lower():
-                logger.warning(f'Format mismatch: Loaded question "{loadedQuestion}" doesn\'t match test question "{myQuestion}"')
+                logger.warning(f'Format of the results is invalid: Question "{loadedQuestion}" doesn\'t match test question "{myQuestion}"')
                 return False
 
         logger.info(f'Format of the file "{fname}" is valid for the test results')
@@ -207,7 +207,7 @@ class ResultCollector(QObject):
         if not fname.endswith('.csv'):
             logger.warning(f'Saving results to a non-csv file "{fname}"')
         if fileExists(fname):
-            logger.info(f'The file already exists, results will be appended')
+            logger.info(f'The file already exists, trying to append the results')
             # check the format to avoid mixing results of different tests
             if not self.structure.checkFileFormat(fname, self.metadataItems + 1):   # +1 for the timestamp label
                 logger.error(f'File format of "{fname}" does not match the current test')

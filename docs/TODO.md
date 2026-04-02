@@ -24,8 +24,8 @@ What needs to be done
 
 
 [ ] Fixes
-    [ ] Separate Reaper initiation from the Player
     [ ] Connect the Finish Test button
+    [ ] Add logging to PlaybackControl, ResultCollector, Player
 
 
 

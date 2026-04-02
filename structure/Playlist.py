@@ -49,14 +49,14 @@ class Playlist:
         try:
             instructs = str(data["instructions"])
         except (KeyError, TypeError, ValueError):
-            logger.warning(f'Failed to parse the instructions for the playlist "{name}"')
+            logger.warning(f'Playlist "{name}" has no instructions')
             instructs = None
         try:
             samps = data["samples"]
             if type(samps) != list:
                 raise TypeError()     
         except (KeyError, TypeError, ValueError):
-            logger.warning(f'Failed to parse playlist "{name}", missing or invalid "samples" entry')
+            logger.warning(f'Playlist "{name}" has no samples')
             samps = []
         osamps = []
         for s in samps:
@@ -72,7 +72,7 @@ class Playlist:
             if type(quests) != list:
                 raise TypeError()
         except (KeyError, TypeError, ValueError):
-            logger.warning(f'Failed to parse playlist "{name}", missing or invalid "questions" entry')
+            logger.warning(f'Playlist "{name}" has no questions')
             quests = []
         oquests = []
         for q in quests:
