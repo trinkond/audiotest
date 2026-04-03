@@ -42,7 +42,9 @@ test = loadTest(testFile)
 
 logger.info("Initializing the Reaper player...")
 player = Player(volume=Settings.volume)
-player.initReaper()
+if not player.initReaper():
+    logger.error("Failed to initialize the player, exiting")
+    sys.exit(1)
 playControl = PlaybackControl(player)
 resultCollector = ResultCollector(test, metadata=None)
 
