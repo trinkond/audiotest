@@ -16,13 +16,19 @@ class QuestionWidget(QWidget):
         self.id = id
 
         label = QLabel(question.text)
-        ratingWidget = RatingWidget(question.rating)
+        self.ratingWidget = RatingWidget(question.rating)
 
         layout = QVBoxLayout()
         layout.addWidget(label)
-        layout.addWidget(ratingWidget)
+        layout.addWidget(self.ratingWidget)
 
-        ratingWidget.ratingChanged.connect(lambda val: self.ratingChanged.emit(val, self.id))
+        self.ratingWidget.ratingChanged.connect(lambda val: self.ratingChanged.emit(val, self.id))
 
         self.setLayout(layout)
+
+    def lockRating(self):
+        self.ratingWidget.lock()
+
+    def unlockRating(self):
+        self.ratingWidget.unlock()
         

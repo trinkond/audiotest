@@ -14,8 +14,8 @@ class Settings:
         "listen in order" : True,
         "allow replay" : False,
         "show ratings" : True,
-        "rate after listening" : True,
-        "allow rating change" : False,
+        "rate any" : False,
+        "rate after" : True,
         "require fill all" : True,
         "allow stop" : True
     }
@@ -25,13 +25,11 @@ class Settings:
         self.volume = config["volume"]
         self.showSampleNames = config["show sample names"]
         self.shuffleSamples = config["shuffle samples"]
-        self.listenInOrder = config["listen in order"],
-        self.allowReplay = config["allow replay"],
         self.listenInOrder = config["listen in order"]
         self.allowReplay = config["allow replay"]
         self.showRatings = config["show ratings"]
-        self.rateAfterListening = config["rate after listening"]
-        self.allowRatingChange = config["allow rating change"]
+        self.rateAny = config["rate any"]
+        self.rateAfter = config["rate after"]
         self.requireFillAll = config["require fill all"]
         self.allowStop = config["allow stop"]
 
@@ -43,8 +41,8 @@ class Settings:
         data["listen in order"] = self.listenInOrder
         data["allow replay"] = self.allowReplay
         data["show ratings"] = self.showRatings
-        data["rate after listening"] = self.rateAfterListening
-        data["allow rating change"] = self.allowRatingChange
+        data["rate any"] = self.rateAny
+        data["rate after"] = self.rateAfter
         data["require fill all"] = self.requireFillAll
         data["allow stop"] = self.allowStop
         return data

@@ -25,8 +25,11 @@ class Scale(QWidget):
         # Map external value to internal slider
         raise NotImplementedError(f"Class {self.__class__} doesn't allo654w to set a value")
 
-    def lock(self, locked: bool = True):
+    def lock(self):
         raise NotImplementedError(f"Class {self.__class__} doesn't implement lock()")
+
+    def unlock(self):
+        raise NotImplementedError(f"Class {self.__class__} doesn't implement unlock()")
 
 class LabeledSlider(Scale):
     """ Slider that supports float values and a custom step,
@@ -84,8 +87,11 @@ class LabeledSlider(Scale):
         val = (val - self.minval) / self.step
         self.slider.setValue(int(round(val)))
 
-    def lock(self, locked: bool = True):
-        self.slider.setEnabled(not locked)
+    def lock(self):
+        self.slider.setEnabled(False)
+
+    def unlock(self):
+        self.slider.setEnabled(True)
 
     def steps(self) -> list:    # returns a list of all the slider steps
         return [self.minval + i * self.step for i in range(self.n_steps + 1)]
@@ -205,9 +211,13 @@ class ButtonRow(Scale):
         except AttributeError:
             pass
 
-    def lock(self, locked: bool = True):
+    def lock(self):
         for btn in self.buttons.values():
-            btn.setEnabled(not locked)
+            btn.setEnabled(False)
+
+    def unlock(self):
+        for btn in self.buttons.values():
+            btn.setEnabled(True)
 
     def sizeHint(self):
         original = super().sizeHint()
@@ -248,9 +258,13 @@ class RatingWidget(QWidget):
             self.valueField.textChanged.connect(self.parseLabel)
             self.valueField.editingFinished.connect(lambda: self.valueUpdate(self.scale.value()))
 
-    def lock(self, locked: bool = True):
-        self.scale.lock(locked)
-        self.valueField.setReadOnly(locked or not self.textEditable)
+    def lock(self):
+        self.scale.lock()
+        self.valueField.setReadOnly(True)
+
+    def unlock(self):
+        self.scale.unlock()
+        self.valueField.setReadOnly(not self.textEditable)
 
     def parseLabel(self, text):
         """ If the label is editted as text """

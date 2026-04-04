@@ -20,7 +20,6 @@ What needs to be done
 [ ] Test settings saving/loading (json/xml)
     [x] Plan the overall structure - sample_settings.json
     [x] Code the parsers & savers for all the objects
-    [ ] Language things
 [ ] Settings editor
 
 
@@ -33,7 +32,7 @@ What needs to be done
     [x] Playback volume
     [x] Sample names (no / track # / from .json)
     [x] Shuffle samples (yes / no)
-    [ ] Listening order (forced linear / can repeat current sample / free)
+    [x] Listening order (forced linear / can repeat current sample / free)
     [x] Display previous scores (yes / no)
     [ ] Rate only after finished listening (yes / no)
     [ ] Change the rating afterwards (yes / no)

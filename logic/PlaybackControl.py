@@ -31,9 +31,13 @@ class PlaybackControl(QObject):
     """ Class holding the playback logic
     Connects to SampleWidget signals and runs the samples using the Player """
 
-    def __init__(self, player : Player, inOrder = False, allowRepeat = True, allowStop = True, parent=None):
+    playbackBegin = pyqtSignal(int)     # item ID
+    playbackEnd = pyqtSignal(int)       # item ID
+
+    def __init__(self, player : Player, object : QObject, inOrder = False, allowRepeat = True, allowStop = True, parent=None):
         super().__init__(parent)
         self.player = player
+        self.object = object
         self.playingWidget = None
         self.inOrder = inOrder
         self.allowRepeat = allowRepeat
@@ -42,7 +46,8 @@ class PlaybackControl(QObject):
         self.itemPlayed = Checklist()   # Holds if an item has been played for repeat checks
         self.lastPlayed = -1            # Holds the last played item for in order playback
 
-        player.finished.connect(self.playbackStop)
+        player.finished.connect(self.playbackFinish)
+        self.registerSamplesRecursive(object)   # Connect to the sample widgets in the object tree
         logger.info(f'initialized PlaybackControl with {"in order playback" if inOrder else "free playback"} and repeat {"allowed" if allowRepeat else "not allowed"}') 
 
     def registerSample(self, sample : SampleWidget):
@@ -58,7 +63,7 @@ class PlaybackControl(QObject):
 
     def playbackStart(self, sample : Sample, id : int):
         if self.player.playing():               # player busy
-            logger.info("Playback requested while player is still playing, ignoring")
+            logger.info("Playback requested while player is playing something, ignoring")
             return
         if not self.allowRepeat and self.itemPlayed.isChecked(id):
             logger.info(f"Playback of item {id} requested, but repeats are not allowed, ignoring")
@@ -72,18 +77,31 @@ class PlaybackControl(QObject):
             self.playingWidget.setPlaying()     # notify the widget, that the playback has started
             self.itemPlayed.check(id)           # mark the item as played
             self.lastPlayed = id                # update the last played item
+            self.playbackBegin.emit(id)         # emit the playback begin signal
             logger.info(f"Started playback of item {id}...")
+
+    def playbackFinish(self):
+        if self.playingWidget is not None:
+            self.playingWidget.setStopped()     # notify the widget, that the playback has stopped
+        self.playingWidget = None
+        self.playbackEnd.emit(self.lastPlayed)  # emit the playback end signal
 
     def playbackStop(self):
         if not self.allowStop:
             logger.info("Stop requested, but stopping is not allowed, ignoring")
             return
         if not self.player.playing():
-            logger.info("Stop requested, but player is not playing")
-        if self.player.stop():                  # stop the playback
-            if self.playingWidget is not None:
-                self.playingWidget.setStopped() # notify the widget, that the playback has stopped
-            self.playingWidget = None
+            logger.info("Stop requested, but player is not playing, ignoring")
+            return
+        if self.player.stop():                      # stop the playback
+            self.playbackFinish()                   # run the standard playback ending code
             logger.info("Player stopped")
 
+    def played(self, item : int) -> bool:
+        return self.itemPlayed.isChecked(item)
 
+    def lastPlayed(self) -> int:
+        return self.lastPlayed
+
+    def isPlaying(self) -> int:
+        return self.player.playing()

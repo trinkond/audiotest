@@ -40,9 +40,11 @@ class ItemWidget(QWidget):
                            # value, ( itemID, questionID )
     ratingChanged = pyqtSignal(Value, tuple)            # emit the rating change to for result collection
 
-    def __init__(self, sample : Sample, instructions : str, questions : list[Question], sampleName=None, summary=True, id : int = 0, parent=None, expanded=False):
+    def __init__(self, sample : Sample, instructions : str, questions : list[Question], sampleName=None, summary=True, id : int = 0, parent=None, expanded=False, locked=False):
         super().__init__(parent)
         self.id = id
+        self.locked = locked
+
 
         self.instructWidget = QLabel(instructions) if instructions else None
         self.sampleWidget = SampleWidget(sample, contextId=id, name=sampleName)
@@ -113,7 +115,17 @@ class ItemWidget(QWidget):
             self.setOpened()
             self.expanded.emit(self)    # notify other widgetsabout the expansion
 
+    def lockRating(self):
+        self.locked = True
+        for quest in self.questWidgets:
+            quest.lockRating()
+
+    def unlockRating(self):
+        self.locked = False
+        for quest in self.questWidgets:
+            quest.unlockRating()
+
     def ratingUpdate(self, val, quest):
         self.ratingChanged.emit(val, (self.id, quest))     # emit the rating change higher
         score = self.rating_scores[quest]
-        score.setText(str(val))                                     # update the label in the summary
+        score.setText(str(val))                            # update the label in the summary

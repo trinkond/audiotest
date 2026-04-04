@@ -15,7 +15,6 @@ player = Player()
 if not player.initReaper():
     logger.error("Failed to connect to Reaper, exiting")
     sys.exit(1)
-control = PlaybackControl(player)
 
 app = QApplication(sys.argv)
 
@@ -38,8 +37,7 @@ for smpl in samples:
 
 window.setLayout(layout)
 
-# connect all the sample signals to the control object
-control.registerSamplesRecursive(window)
+control = PlaybackControl(player, window)
 
 window.show()
 
