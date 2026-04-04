@@ -7,13 +7,14 @@ from ..player.Player import Player
 class SampleWidget(QWidget):
     """ A widget representing a sample that can be played, with a play controls and a label """
 
-    requestPlayback = pyqtSignal(Sample)
+    requestPlayback = pyqtSignal(Sample, int)
     requestStop = pyqtSignal()
 
-    def __init__(self, sample : Sample, name=None, parent=None):
+    def __init__(self, sample : Sample, contextId=0, name=None, parent=None):
         super().__init__(parent)
 
         self.sample = sample   # store reference to the sample
+        self.contextId = contextId
 
         name = str(name) if name else f'Sample{" ID: " + str(sample.id) if sample.id else ""}'
         label = QLabel(name)
@@ -32,7 +33,7 @@ class SampleWidget(QWidget):
 
     def buttonClicked(self, state):
         if not self.playing:
-            self.requestPlayback.emit(self.sample)
+            self.requestPlayback.emit(self.sample, self.contextId)
         else:
             self.requestStop.emit()
 

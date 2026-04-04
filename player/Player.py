@@ -68,18 +68,18 @@ class Player(QObject):
                 self.reaper.Play,
                 )
         except ReaperError as e:
-            logger.error(f"Failed to play region {region} on track {track}: {e}")
+            logger.error(f"Failed to play region {region if region else ''} on track {track}: {e}")
             return False
 
         self.timer.start(int((region.duration + self.REAPER_DELAY) * 1000))
-        logger.info(f'Playing track {track} at region {region}...')
+        logger.info(f'Playing track {track} {"at region " + str(region) if region else ""}...')
         return True
 
     def playSample(self, sample : Sample) -> bool:
         if sample is None:
             logger.error("Failed to play, no sample provided")
             return False
-        logger.info(f'Playing sample "{sample.id}"...')
+        logger.info(f'Playing sample "{sample.id if sample.id else ""}"...')
         return self.playTrack(sample.track, sample.region)
 
     def stop(self) -> bool:
@@ -106,5 +106,5 @@ class Player(QObject):
             SystemVolume.SetVolume(level=volume, mute=False)
             self.volume = volume
         except Exception as e:
-            logger.warning(f"Failed to set system volume to {self.volume}: {e}")
+            logger.warning(f"Failed to set system volume to {volume}: {e}")
         logger.info(f"Set volume to {self.volume}")

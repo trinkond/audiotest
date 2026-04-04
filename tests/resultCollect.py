@@ -1,5 +1,8 @@
 """ Testing of the ResultCollector and ItemWidget communication """
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 import sys, os
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 
@@ -37,7 +40,7 @@ quests = [
 ]
 
 playlist = Playlist(samples, "Listen to the sample and answer all the questions", quests, name="God playlist")
-test = Test({}, {}, {}, {}, [playlist])
+test = Test([playlist])
 
 rescol = ResultCollector(test, metadata="Test,User")
 

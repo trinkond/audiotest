@@ -41,16 +41,14 @@ class ResultStructure():
     def __init__(self, test : Test):
         self.test = test
 
-    def getArray(self, initval : Value = None) -> list[list[list[Value]]]:
+    def getArray(self, initval : Value = None) -> list[list[Value]]:
         """ generates an empty array for the results with the structure of the test """
         out = []
         for playlist in self.test.playlists:
-            playlistData = []
             questionCount = len(playlist.questions)
             for sample in playlist.samples:
                 sampleData = [initval] * questionCount
-                playlistData.append(sampleData)
-            out.append(playlistData)
+                out.append(sampleData)
         return out
 
     def getItems(self) -> list[tuple[str, str, str]]:
@@ -132,22 +130,19 @@ class Results:
         self.structure = structure
         self.data = structure.getArray()
 
-    def writeRating(self, playlist : int, sample : int, question : int, val : Value):
+    def writeRating(self, item : int, question : int, val : Value):
         """ Write a rating value into the data structure """
-        if playlist < 0 or playlist >= len(self.data):
-            raise IndexError(f"Playlist index {playlist} out of range")
-        if sample < 0 or sample >= len(self.data[playlist]):
-            raise IndexError(f"Sample index {sample} out of range")
-        if question < 0 or question >= len(self.data[playlist][sample]):
+        if item < 0 or item >= len(self.data):
+            raise IndexError(f"Item index {item} out of range")
+        if question < 0 or question >= len(self.data[item]):
             raise IndexError(f"Question index {question} out of range")
 
-        self.data[playlist][sample][question] = val
+        self.data[item][question] = val
 
     def filled(self):
         """ Check if all ratings have been filled """
-        for playlist in self.data:
-            for sample in playlist:
-                for rating in sample:
+        for item in self.data:
+            for rating in item:
                     if rating is None:
                         return False
         return True
@@ -155,11 +150,21 @@ class Results:
     def export(self) -> list[int]:
         """ Export the ratings as a list of values """
         out = []
-        for playlist in self.data:
-            for sample in playlist:
-                for val in sample:
-                    out.append(val.value if val is not None else VALUE_MISSING)
+        for item in self.data:
+            for val in item:
+                out.append(val.value if val is not None else VALUE_MISSING)
         return out
+        
+    def size(self) -> int:
+        """ Get the total number of ratings in the results """
+        count = 0
+        for item in self.data:
+            count += len(item)
+        return count
+
+    def items(self) -> int:
+        """ Get the number of items in the results """
+        return len(self.data)
 
 class ResultCollector(QObject):
     """ Collects the ratings inputted by the user
@@ -167,12 +172,12 @@ class ResultCollector(QObject):
 
     def __init__(self, test : Test, metadata : str = "Test", parent=None):
         super().__init__(parent)
-        logger.info("Initializing the result collector")
         self.test = test
         self.metadata = metadata
         self.metadataItems = self.metadata.count(",") + 1 if self.metadata else 0
         self.structure = ResultStructure(test)
         self.results = Results(self.structure)
+        logger.info(f"Initialized result collector with {self.results.items()} items and {self.results.size()} ratings.")
 
     def registerItem(self, item : ItemWidget):
         item.ratingChanged.connect(self.ratingCollect)
@@ -184,10 +189,11 @@ class ResultCollector(QObject):
         for child in obj.findChildren(QObject):
             self.registerItemsRecursive(child)
 
-    def ratingCollect(self, val : Value, source : tuple[int, int, int]):
-        playlist, sample, question = source
+    def ratingCollect(self, val : Value, source : tuple[int, int]):
+        item, question, = source
         try:
-            self.results.writeRating(playlist, sample, question, val)
+            self.results.writeRating(item, question, val)
+            logger.info(f"Collected rating for item {item}, question {question}: {val}")
         except IndexError as e:
             logger.error(f"Error writing rating: {e}")
 

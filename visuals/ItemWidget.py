@@ -37,16 +37,15 @@ class ItemWidget(QWidget):
     """ A widget representing an item containing a sample to be played and a list of questions to be filed """
     
     expanded = pyqtSignal(object)                       # emits itself when clicked and expanded
-                           # value, ( playlistID, itemID, questionID )
+                           # value, ( itemID, questionID )
     ratingChanged = pyqtSignal(Value, tuple)            # emit the rating change to for result collection
 
-    def __init__(self, sample : Sample, instructions : str, questions : list[Question], sampleName=None, summary=True, id : int = 0, playlist : int = 0, parent=None, expanded=False):
+    def __init__(self, sample : Sample, instructions : str, questions : list[Question], sampleName=None, summary=True, id : int = 0, parent=None, expanded=False):
         super().__init__(parent)
         self.id = id
-        self.pl = playlist
 
         self.instructWidget = QLabel(instructions) if instructions else None
-        self.sampleWidget = SampleWidget(sample, name=sampleName)
+        self.sampleWidget = SampleWidget(sample, contextId=id, name=sampleName)
         self.questWidgets = []
         for i, quest in enumerate(questions):
             self.questWidgets.append(QuestionWidget(quest, i))
@@ -115,6 +114,6 @@ class ItemWidget(QWidget):
             self.expanded.emit(self)    # notify other widgetsabout the expansion
 
     def ratingUpdate(self, val, quest):
-        self.ratingChanged.emit(val, (self.pl, self.id, quest))     # emit the rating change higher
+        self.ratingChanged.emit(val, (self.id, quest))     # emit the rating change higher
         score = self.rating_scores[quest]
         score.setText(str(val))                                     # update the label in the summary

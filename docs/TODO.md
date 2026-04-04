@@ -29,18 +29,20 @@ What needs to be done
     [ ] Add logging to PlaybackControl
 
 [ ] Features
-    [ ] Language settings
+    [x] Language settings
     [x] Playback volume
-    [ ] Sample names (no / track #, from .json)
-    [ ] Shuffle samples (yes / no)
+    [x] Sample names (no / track # / from .json)
+    [x] Shuffle samples (yes / no)
     [ ] Listening order (forced linear / can repeat current sample / free)
-    [ ] Display previous scores (yes / no)
+    [x] Display previous scores (yes / no)
     [ ] Rate only after finished listening (yes / no)
     [ ] Change the rating afterwards (yes / no)
     [ ] Force to fill everything
+    [ ] Allow stop
 
 [ ] Additional
     [ ] Double comparison samples
     [ ] Shuffle comparison samples
+    [ ] Color themes
 
 

@@ -16,7 +16,8 @@ class Settings:
         "show ratings" : True,
         "rate after listening" : True,
         "allow rating change" : False,
-        "require fill all" : True
+        "require fill all" : True,
+        "allow stop" : True
     }
 
     def __init__(self, data : dict):        
@@ -32,6 +33,7 @@ class Settings:
         self.rateAfterListening = config["rate after listening"]
         self.allowRatingChange = config["allow rating change"]
         self.requireFillAll = config["require fill all"]
+        self.allowStop = config["allow stop"]
 
     def toDict(self) -> dict:
         data = {}
@@ -44,6 +46,7 @@ class Settings:
         data["rate after listening"] = self.rateAfterListening
         data["allow rating change"] = self.allowRatingChange
         data["require fill all"] = self.requireFillAll
+        data["allow stop"] = self.allowStop
         return data
 
 SettingsDefault = Settings(Settings.config_default)

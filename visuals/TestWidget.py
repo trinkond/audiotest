@@ -26,17 +26,19 @@ class TestWidget(QWidget):
         language = test.language
 
         self.itemWidgets = []
-        di = 1      # displayed index
-        for pi, playlist in enumerate(self.test.playlists):
+        id = 0      # item index for playback and result identification
+        dispid = 1  # index for display
+        for playlist in self.test.playlists:
             items = []
-            for si, sample in enumerate(playlist.samples):
+            for sample in playlist.samples:
                 if settings.showSampleNames and sample.id:
                     name = str(sample.id)
                 else:
-                    name = language.sample + " " + str(di)
-                    di += 1
-                item = ItemWidget(sample, playlist.instructions, playlist.questions, sampleName=name, summary=settings.showRatings, id=si, playlist=pi)
+                    name = language.sample + " " + str(dispid)
+                    dispid += 1
+                item = ItemWidget(sample, playlist.instructions, playlist.questions, sampleName=name, summary=settings.showRatings, id=id)
                 items.append(item)
+                id += 1
             if settings.shuffleSamples:
                 random.shuffle(items)
             self.itemWidgets.extend(items)
