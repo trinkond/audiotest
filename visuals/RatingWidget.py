@@ -25,6 +25,9 @@ class Scale(QWidget):
         # Map external value to internal slider
         raise NotImplementedError(f"Class {self.__class__} doesn't allo654w to set a value")
 
+    def lock(self, locked: bool = True):
+        raise NotImplementedError(f"Class {self.__class__} doesn't implement lock()")
+
 class LabeledSlider(Scale):
     """ Slider that supports float values and a custom step,
     renders with automatic labels underneath the slider """
@@ -80,6 +83,9 @@ class LabeledSlider(Scale):
         val = max(min(val, self.maxval), self.minval)   # clamp the value to the slider range
         val = (val - self.minval) / self.step
         self.slider.setValue(int(round(val)))
+
+    def lock(self, locked: bool = True):
+        self.slider.setEnabled(not locked)
 
     def steps(self) -> list:    # returns a list of all the slider steps
         return [self.minval + i * self.step for i in range(self.n_steps + 1)]
@@ -199,6 +205,10 @@ class ButtonRow(Scale):
         except AttributeError:
             pass
 
+    def lock(self, locked: bool = True):
+        for btn in self.buttons.values():
+            btn.setEnabled(not locked)
+
     def sizeHint(self):
         original = super().sizeHint()
         return QSize(original.width() + 200, original.height())
@@ -213,6 +223,7 @@ class RatingWidget(QWidget):
         super().__init__(parent)
 
         self.rating = rating
+        self.textEditable = textEditable
 
         self.valueField = QLineEdit()
         self.valueField.setReadOnly(not textEditable)
@@ -236,6 +247,10 @@ class RatingWidget(QWidget):
         if textEditable:
             self.valueField.textChanged.connect(self.parseLabel)
             self.valueField.editingFinished.connect(lambda: self.valueUpdate(self.scale.value()))
+
+    def lock(self, locked: bool = True):
+        self.scale.lock(locked)
+        self.valueField.setReadOnly(locked or not self.textEditable)
 
     def parseLabel(self, text):
         """ If the label is editted as text """
