@@ -25,7 +25,7 @@ What needs to be done
 
 [ ] Fixes
     [ ] Connect the Finish Test button
-    [ ] Add logging to PlaybackControl, ResultCollector, Player
+    [ ] Add logging to PlaybackControl
 
 
 

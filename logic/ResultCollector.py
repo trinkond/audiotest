@@ -65,8 +65,6 @@ class ResultStructure():
 
         if not fname.endswith('.csv'):
             logger.warning(f'The file "{fname}" does not have a .csv extension')
-        else:
-            logger.info(f'Verifying the format of results in the file "{fname}"')
 
         try:
             with open(fname, 'r') as csvfile:
@@ -79,7 +77,8 @@ class ResultStructure():
         except Exception as e:
             logger.error(f'Failed to load the file "{fname}", error: {e}')
             return False
-        
+
+        logger.info(f'Verifying the format of results in the file "{fname}"')
         loadedItems = zip(playlists[labelFields:], samples[labelFields:], questions[labelFields:])  # skip the labels
 
         for myStruct, loaded in zip(self.getItems(), loadedItems):
@@ -168,7 +167,7 @@ class ResultCollector(QObject):
 
     def __init__(self, test : Test, metadata : str = "Test", parent=None):
         super().__init__(parent)
-
+        logger.info("Initializing the result collector")
         self.test = test
         self.metadata = metadata
         self.metadataItems = self.metadata.count(",") + 1 if self.metadata else 0
@@ -198,7 +197,7 @@ class ResultCollector(QObject):
     def allFilled(self):
         return self.results.filled()
 
-    def saveResults(self, fname : str) -> bool:
+    def saveResults(self, fname : str, overwrite : bool = False) -> bool:
         """ Save the results into a csv file, with the header and timestamp
         if there is already a file with the given name, the new results will be appended """
 
@@ -209,10 +208,13 @@ class ResultCollector(QObject):
         if fileExists(fname):
             logger.info(f'The file already exists, trying to append the results')
             # check the format to avoid mixing results of different tests
-            if not self.structure.checkFileFormat(fname, self.metadataItems + 1):   # +1 for the timestamp label
-                logger.error(f'File format of "{fname}" does not match the current test')
+            if self.structure.checkFileFormat(fname, self.metadataItems + 1):   # +1 for the timestamp label
+                logger.info(f'Appending test results to the file "{fname}"')
+            elif overwrite:
+                logger.info(f'Unable to append, overwriting the file "{fname}"')
+            else:
+                logger.error(f'File format of "{fname}" does not match the current test, nothing was saved')
                 return False
-            logger.info(f'Appending test results to the file "{fname}"')
         else:
             logger.info(f'Saving test results to a new file "{fname}"')
             # start the new file with the header

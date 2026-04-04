@@ -31,6 +31,7 @@ class Player(QObject):
 
     def initReaper(self) -> bool:
         """ Initializes the player, must be called before playing any sample """
+        logger.info("Initializing the player...")
         try:
             self.reaper = ReaperAPI(self.reaperAddress)
             self.reaper.command(
@@ -43,6 +44,7 @@ class Player(QObject):
             logger.error(f"Failed to initiate the connection to Reaper: {e}")
             return False
         self.setVolume(self.volume)
+        logger.info("Player initialized successfully")
         return True
 
     def playTrack(self, track : int, region : Region) -> bool:
@@ -70,12 +72,14 @@ class Player(QObject):
             return False
 
         self.timer.start(int((region.duration + self.REAPER_DELAY) * 1000))
+        logger.info(f'Playing track {track} at region {region}...')
         return True
 
     def playSample(self, sample : Sample) -> bool:
         if sample is None:
             logger.error("Failed to play, no sample provided")
             return False
+        logger.info(f'Playing sample "{sample.id}"...')
         return self.playTrack(sample.track, sample.region)
 
     def stop(self) -> bool:
@@ -88,6 +92,7 @@ class Player(QObject):
             logger.error(f"Failed to stop playback: {e}")
             return False
         self.timer.stop()
+        logger.info("Playback stopped")
         return True
 
     def playing(self) -> bool:
@@ -102,3 +107,4 @@ class Player(QObject):
             self.volume = volume
         except Exception as e:
             logger.warning(f"Failed to set system volume to {self.volume}: {e}")
+        logger.info(f"Set volume to {self.volume}")
