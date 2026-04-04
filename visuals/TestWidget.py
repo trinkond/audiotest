@@ -3,16 +3,18 @@
 from PyQt6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QSizePolicy, QPushButton
 from PyQt6.QtCore import Qt, pyqtSignal
 
+import random
+
 from ..structure.Test import Test
+from ..structure.Language import Language, LanguageDefault
+from ..structure.Settings import Settings, SettingsDefault
 from .SampleWidget import SampleWidget
 from .QuestionWidget import QuestionWidget
 from .ItemWidget import ItemWidget
 
-END_THE_TEST = "Finish the test"
-
 class EndButton(QPushButton):
-    def __init__(self, parent=None):
-        super().__init__(text=END_THE_TEST, parent=parent)
+    def __init__(self, text : str = LanguageDefault.endTest, parent=None):
+        super().__init__(text=text, parent=parent)
 
 class TestWidget(QWidget):
     """  A widget to represent the whole test as a list of items (samples with questions) """
@@ -20,14 +22,26 @@ class TestWidget(QWidget):
         super().__init__(parent)
 
         self.test = test                    # reference to the test
+        settings = test.settings
+        language = test.language
 
         self.itemWidgets = []
+        di = 1      # displayed index
         for pi, playlist in enumerate(self.test.playlists):
+            items = []
             for si, sample in enumerate(playlist.samples):
-                item = ItemWidget(sample, playlist.instructions, playlist.questions, id=si, playlist=pi)
-                self.itemWidgets.append(item)
+                if settings.showSampleNames and sample.id:
+                    name = str(sample.id)
+                else:
+                    name = language.sample + " " + str(di)
+                    di += 1
+                item = ItemWidget(sample, playlist.instructions, playlist.questions, sampleName=name, summary=settings.showRatings, id=si, playlist=pi)
+                items.append(item)
+            if settings.shuffleSamples:
+                random.shuffle(items)
+            self.itemWidgets.extend(items)
 
-        endButton = EndButton()
+        endButton = EndButton(language.endTest)
 
         layout = QVBoxLayout()
         layout.setSpacing(4)

@@ -6,5 +6,6 @@ from .Question import Question
 from .Rating import Rating, RatingDiscrete, RatingContinuous, Value
 from .Playlist import Playlist
 from .Test import Test, loadTest
+from .Settings import Settings
 
 

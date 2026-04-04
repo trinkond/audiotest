@@ -19,7 +19,7 @@ questions = [
     ]
 playlist = Playlist(samples, instructions, questions)
 
-test = Test({}, {}, {}, {}, [playlist])
+test = Test([playlist])
 
 window = Window(test)
 window.setWindowTitle("Rating test")

@@ -15,6 +15,7 @@ What needs to be done
     [x] Choose the saving filetype - .csv
     [x] Class accepting UI signals and collecting results - RatingCollector
     [x] Design the result storing format - test_results.csv
+    [x] How to save unfilled fields
 [ ] The test logic and global settings
 [ ] Test settings saving/loading (json/xml)
     [x] Plan the overall structure - sample_settings.json
@@ -27,5 +28,19 @@ What needs to be done
     [ ] Connect the Finish Test button
     [ ] Add logging to PlaybackControl
 
+[ ] Features
+    [ ] Language settings
+    [x] Playback volume
+    [ ] Sample names (no / track #, from .json)
+    [ ] Shuffle samples (yes / no)
+    [ ] Listening order (forced linear / can repeat current sample / free)
+    [ ] Display previous scores (yes / no)
+    [ ] Rate only after finished listening (yes / no)
+    [ ] Change the rating afterwards (yes / no)
+    [ ] Force to fill everything
+
+[ ] Additional
+    [ ] Double comparison samples
+    [ ] Shuffle comparison samples
 
 

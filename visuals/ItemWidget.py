@@ -40,13 +40,13 @@ class ItemWidget(QWidget):
                            # value, ( playlistID, itemID, questionID )
     ratingChanged = pyqtSignal(Value, tuple)            # emit the rating change to for result collection
 
-    def __init__(self, sample : Sample, instructions : str, questions : list[Question], id : int = 0, playlist : int = 0, parent=None, expanded=False):
+    def __init__(self, sample : Sample, instructions : str, questions : list[Question], sampleName=None, summary=True, id : int = 0, playlist : int = 0, parent=None, expanded=False):
         super().__init__(parent)
         self.id = id
         self.pl = playlist
 
         self.instructWidget = QLabel(instructions) if instructions else None
-        self.sampleWidget = SampleWidget(sample)
+        self.sampleWidget = SampleWidget(sample, name=sampleName)
         self.questWidgets = []
         for i, quest in enumerate(questions):
             self.questWidgets.append(QuestionWidget(quest, i))
@@ -66,7 +66,8 @@ class ItemWidget(QWidget):
         self.header = QWidget()
         header_layout = QHBoxLayout(self.header)
         header_layout.addWidget(self.sampleWidget)
-        header_layout.addWidget(self.rating_summary)
+        if summary:
+            header_layout.addWidget(self.rating_summary)
         self.header.setMaximumHeight(60)
         header_layout.setContentsMargins(0, 0, 0, 0)    # leave only main layout margins
 

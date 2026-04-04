@@ -10,12 +10,13 @@ class SampleWidget(QWidget):
     requestPlayback = pyqtSignal(Sample)
     requestStop = pyqtSignal()
 
-    def __init__(self, sample : Sample, parent=None):
+    def __init__(self, sample : Sample, name=None, parent=None):
         super().__init__(parent)
 
         self.sample = sample   # store reference to the sample
 
-        label = QLabel(sample.id)
+        name = str(name) if name else f'Sample{" ID: " + str(sample.id) if sample.id else ""}'
+        label = QLabel(name)
         self.button = QPushButton()
         self.button.setFixedSize(40, 40)
         self.setStopped()

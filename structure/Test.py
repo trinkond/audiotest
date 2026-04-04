@@ -8,30 +8,22 @@ from .Sample import parseRegions, parseSamples, saveRegions, saveSamples
 from .Rating import parseRatings, saveRatings
 from .Question import parseQuestions, saveQuestions
 from .Playlist import parsePlaylists, savePlaylists
-
-def loadDefault(data : dict, default : dict) -> dict:
-    """ Loads data from the dict, filling missing keys with defaults and checking type """
-    data = data.copy()
-    for key in default:
-        if not key in data:
-            logger.warning(f'Missing entry for "{key}", filled with default value {default[key]}')
-            data[key] = default[key]
-            continue
-        if default[key] is None:
-            continue
-        if type(data[key]) != type(default[key]):
-            logger.error(f'Entry for "{key}" is incompatible format {type(data[key])}, default value {default[key]} has been taken')
-            data[key] = default[key]
-    return data
+from .Settings import Settings, SettingsDefault
+from .Language import Language, LanguageDefault
+from .utils import loadDefault
 
 class Test:
 
-    def __init__(self, regions, samples, ratings, questions, playlists):
+    def __init__(self, playlists = [], settings = SettingsDefault, language = LanguageDefault, regions = {}, samples = {}, ratings = {}, questions = {}, version ="1.0", title = "Test"):
+        self.version = version
+        self.title = title
         self.regions = regions
         self.samples = samples
         self.ratings = ratings
         self.questions = questions
         self.playlists = playlists
+        self.settings = settings
+        self.language = language
 
     def __repr__(self):
         ret = "Audio test:\n"
@@ -45,9 +37,8 @@ class Test:
     config_default = {
         "version" : None,
         "title" : None,
-        "volume" : 100,
-
-        ##language : "EN",
+        "settings" : {},
+        "language" : {},
 
         "regions" : {},
         "samples" : {},
@@ -72,11 +63,21 @@ class Test:
         quests = parseQuestions(quests, rats)
         plays = config["playlists"]
         plays = parsePlaylists(plays, samples, quests)
+        setts = config["settings"]
+        setts = Settings(setts)
+        lang = config["language"]
+        lang = Language(lang)
+        version = config["version"]
+        title = config["title"]
 
-        return Test(regs, samples, rats, quests, plays)
+        return Test(plays, setts, lang, regs, samples, rats, quests, version, title)
 
     def toDict(self) -> dict:
         data = {}
+        data["version"] = self.version
+        data["title"] = self.title
+        data["settings"] = self.settings.toDict()
+        data["language"] = self.language.toDict()
         data["regions"] = saveRegions(self.regions)
         data["samples"] = saveSamples(self.samples)
         data["ratings"] = saveRatings(self.ratings)

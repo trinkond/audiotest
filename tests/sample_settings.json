@@ -1,7 +1,19 @@
 {
+    
     "version" : "0.1",
     "title" : "Ukázkový test",
-    "volume" : 100,
+
+    "settings" : {
+        "volume" : 100,
+        "show sample names" : false,
+        "shuffle samples" : false,
+        "listen in order" : true,
+        "allow replay" : false,
+        "show ratings" : true,
+        "rate after listening" : true,
+        "allow rating change" : false,
+        "require fill all" : true
+    },
          
     "language" : {
         "sample" : "stopa",
