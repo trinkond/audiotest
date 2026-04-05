@@ -1,5 +1,8 @@
 """ Testing the visuals of my PlayList """
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 import sys
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
 from ..structure.Playlist import Playlist
@@ -8,6 +11,7 @@ from ..structure.Question import Question
 from ..structure.Rating import RatingDiscrete, RatingContinuous, Rating
 from ..structure.Test import Test
 from ..visuals.Window import Window
+from ..themes.themes import ThemeList
 
 app = QApplication(sys.argv)
 
@@ -19,14 +23,9 @@ questions = [
     ]
 playlist = Playlist(samples, instructions, questions)
 
-test = Test([playlist])
+test = Test([playlist], title="Window test", theme=ThemeList["big"])
 
 window = Window(test)
-window.setWindowTitle("Rating test")
-
-# Load the QSS stylessheet
-with open("audiotest/visuals/style.qss", "r") as f:
-    app.setStyleSheet(f.read())
 
 window.show()
 

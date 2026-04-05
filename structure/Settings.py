@@ -17,7 +17,8 @@ class Settings:
         "rate any" : False,
         "rate after" : True,
         "require fill all" : True,
-        "allow stop" : True
+        "allow stop" : True,
+        "overwrite results" : False
     }
 
     def __init__(self, data : dict):        
@@ -32,6 +33,7 @@ class Settings:
         self.rateAfter = config["rate after"]
         self.requireFillAll = config["require fill all"]
         self.allowStop = config["allow stop"]
+        self.overwriteResults = config["overwrite results"]
 
     def toDict(self) -> dict:
         data = {}
@@ -45,6 +47,7 @@ class Settings:
         data["rate after"] = self.rateAfter
         data["require fill all"] = self.requireFillAll
         data["allow stop"] = self.allowStop
+        data["overwrite results"] = self.overwriteResults
         return data
 
 SettingsDefault = Settings(Settings.config_default)

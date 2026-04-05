@@ -1,0 +1,87 @@
+QWidget {
+    background-color: #161a1f;
+    color: #e6edf3;
+    font-family: Arial;
+    font-size: 12px;
+}
+
+QLabel {
+    color: #e6edf3;
+}
+
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+
+QLineEdit {
+    background-color: #0f1318;
+    color: #e6edf3;
+    border: 1px solid #3b4652;
+    border-radius: 4px;
+    padding: 4px 6px;
+}
+
+QLineEdit:read-only {
+    background-color: #1c2229;
+    color: #a9b4bf;
+}
+
+QPushButton {
+    background-color: #20262e;
+    color: #e6edf3;
+    border: 1px solid #46515e;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+QPushButton:hover {
+    background-color: #26303a;
+}
+
+QPushButton:disabled {
+    background-color: #171c22;
+    color: #6e7883;
+    border-color: #313943;
+}
+
+QRadioButton {
+    spacing: 6px;
+}
+
+QRadioButton:disabled {
+    color: #6e7883;
+}
+
+QSlider::groove:horizontal {
+    height: 6px;
+    background: #39424d;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal {
+    width: 14px;
+    margin: -5px 0;
+    background: #58a6ff;
+    border: 1px solid #2f81f7;
+    border-radius: 7px;
+}
+
+QSlider::handle:horizontal:disabled {
+    background: #5a6570;
+    border-color: #444d56;
+}
+
+ItemWidget {
+    background-color: #20262e;
+    border: 1px solid #38424d;
+    border-radius: 6px;
+}
+
+QuestionWidget {
+    background-color: #1a1f26;
+}
+
+RatingWidget {
+    background-color: transparent;
+}

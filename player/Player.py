@@ -72,14 +72,14 @@ class Player(QObject):
             return False
 
         self.timer.start(int((region.duration + self.REAPER_DELAY) * 1000))
-        logger.info(f'Playing track {track} {"at region " + str(region) if region else ""}...')
+        logger.debug(f'Playing track {track} {"at region " + str(region) if region else ""}...')
         return True
 
     def playSample(self, sample : Sample) -> bool:
         if sample is None:
             logger.error("Failed to play, no sample provided")
             return False
-        logger.info(f'Playing sample "{sample.id if sample.id else ""}"...')
+        logger.debug(f'Playing sample "{sample.id if sample.id else ""}"...')
         return self.playTrack(sample.track, sample.region)
 
     def stop(self) -> bool:
@@ -92,12 +92,12 @@ class Player(QObject):
             logger.error(f"Failed to stop playback: {e}")
             return False
         self.timer.stop()
-        logger.info("Playback stopped")
+        logger.debug("Playback stopped")
         return True
 
     def playing(self) -> bool:
         if self.reaper is None:
-            logger.warning("Player not initialized, checking playing state is irrelevant")
+            logger.debug("Player not initialized, checking playing state is irrelevant")
             return False
         return self.timer.isActive()
 

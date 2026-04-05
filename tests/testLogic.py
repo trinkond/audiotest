@@ -35,10 +35,6 @@ player.initReaper()
 playback = PlaybackControl(player, window, inOrder=False, allowRepeat=True, allowStop=True)
 ratingLock = RatingLockLogic(playback, window, rateAny=False, rateAfter=True)
 
-# Load the QSS stylessheet
-with open("audiotest/visuals/style.qss", "r") as f:
-    app.setStyleSheet(f.read())
-
 window.show()
 
 sys.exit(app.exec())

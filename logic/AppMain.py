@@ -41,10 +41,9 @@ class AppMain():
 
     def saveResults(self, filename : str) -> bool:
         logger.info(f"Saving results to {filename}")
-        ret = self.resultCollector.saveResults(filename)
+        ret = self.resultCollector.saveResults(filename, overwrite=self.settings.overwriteResults)
         if ret:
             logger.info("Results saved successfully")
         else:
             logger.error("Failed to save the results")
         return ret
-        

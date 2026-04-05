@@ -11,12 +11,14 @@ from .Playlist import parsePlaylists, savePlaylists
 from .Settings import Settings, SettingsDefault
 from .Language import Language, LanguageDefault
 from .utils import loadDefault
+from ..themes.themes import ThemeDefault
 
 class Test:
 
-    def __init__(self, playlists = [], settings = SettingsDefault, language = LanguageDefault, regions = {}, samples = {}, ratings = {}, questions = {}, version ="1.0", title = "Test"):
+    def __init__(self, playlists = [], settings = SettingsDefault, language = LanguageDefault, regions = {}, samples = {}, ratings = {}, questions = {}, version = "0.0", title = "Test", theme = ThemeDefault):
         self.version = version
         self.title = title
+        self.theme = theme
         self.regions = regions
         self.samples = samples
         self.ratings = ratings
@@ -35,8 +37,9 @@ class Test:
         return repr(self)
 
     config_default = {
-        "version" : None,
-        "title" : None,
+        "version" : "0.0",
+        "title" : "Test",
+        "theme" : ThemeDefault,
         "settings" : {},
         "language" : {},
 
@@ -69,13 +72,15 @@ class Test:
         lang = Language(lang)
         version = config["version"]
         title = config["title"]
+        theme = config["theme"]
 
-        return Test(plays, setts, lang, regs, samples, rats, quests, version, title)
+        return Test(plays, setts, lang, regs, samples, rats, quests, version, title, theme)
 
     def toDict(self) -> dict:
         data = {}
         data["version"] = self.version
         data["title"] = self.title
+        data["theme"] = self.theme
         data["settings"] = self.settings.toDict()
         data["language"] = self.language.toDict()
         data["regions"] = saveRegions(self.regions)

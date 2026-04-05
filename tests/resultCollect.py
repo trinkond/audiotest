@@ -51,9 +51,6 @@ window.setLayout(layout)
 # connect all the sample signals to the result collector
 rescol.registerItemsRecursive(window)
 
-with open("audiotest/visuals/style.qss", "r") as f:
-    app.setStyleSheet(f.read())
-
 window.show()
 
 ret = app.exec()

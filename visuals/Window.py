@@ -1,4 +1,7 @@
 
+import logging
+logger = logging.getLogger(__name__)
+
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QLabel
 from PyQt6.QtCore import Qt, QSize
 from ..structure.Test import Test
@@ -27,6 +30,14 @@ class Window(QWidget):
         self.setMinimumWidth(self.minimumSizeHint().width())
 
         self.setWindowTitle(test.title)
+
+        try:
+            with open(test.theme, "r") as f:
+                self.setStyleSheet(f.read())
+        except FileNotFoundError:
+            logger.error(f'Failed to load theme, file "{test.theme}" not found')
+        except Exception as e:
+            logger.error(f'Failed to load theme from "{test.theme}", unexpected error: {e}')
 
     def marginWidth(self) -> int:
         margins = self.layout().contentsMargins()

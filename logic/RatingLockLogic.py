@@ -23,6 +23,7 @@ class RatingLockLogic(QObject):
             self.playback.playbackBegin.connect(lambda _: self.lockAllRecursive(self.object))
             self.playback.playbackEnd.connect(lambda _: self.lockAllRecursive(self.object))
             self.lockAllRecursive(self.object)
+        logger.info(f'Initialized rating lock logic with {"free rating" if rateAny else "current item rating"} and {"rating only after playback" if rateAfter else "rating during playback allowed"}')
 
     def lockItem(self, item : ItemWidget):
         """ Locks the item based on the settings and current state """

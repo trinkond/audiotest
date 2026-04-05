@@ -1,7 +1,4 @@
 
-import logging
-logger = logging.getLogger(__name__)
-
 from .utils import loadDefault
 
 class Language:

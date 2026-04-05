@@ -48,7 +48,7 @@ class PlaybackControl(QObject):
 
         player.finished.connect(self.playbackFinish)
         self.registerSamplesRecursive(object)   # Connect to the sample widgets in the object tree
-        logger.info(f'initialized PlaybackControl with {"in order playback" if inOrder else "free playback"} and repeat {"allowed" if allowRepeat else "not allowed"}') 
+        logger.info(f'Initialized PlaybackControl with {"in order playback" if inOrder else "free playback"} and repeat {"allowed" if allowRepeat else "not allowed"}') 
 
     def registerSample(self, sample : SampleWidget):
         sample.requestPlayback.connect(self.playbackStart)
