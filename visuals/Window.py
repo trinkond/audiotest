@@ -26,6 +26,8 @@ class Window(QWidget):
         self.setLayout(layout)
         self.setMinimumWidth(self.minimumSizeHint().width())
 
+        self.setWindowTitle(test.title)
+
     def marginWidth(self) -> int:
         margins = self.layout().contentsMargins()
         width = margins.left() + margins.right()                # add the layout margins
