@@ -16,16 +16,15 @@ What needs to be done
     [x] Class accepting UI signals and collecting results - RatingCollector
     [x] Design the result storing format - test_results.csv
     [x] How to save unfilled fields
-[ ] The test logic and global settings
-[ ] Test settings saving/loading (json/xml)
+[x] The test logic and global settings
+[x] Test settings saving/loading (json/xml)
     [x] Plan the overall structure - sample_settings.json
     [x] Code the parsers & savers for all the objects
 [ ] Settings editor
 
-
 [ ] Fixes
     [ ] Connect the Finish Test button
-    [ ] Add logging to PlaybackControl
+    [ ] Add popup window, when the end_test isn't available and the save results doesn't work
 
 [ ] Features
     [x] Language settings
@@ -34,10 +33,10 @@ What needs to be done
     [x] Shuffle samples (yes / no)
     [x] Listening order (forced linear / can repeat current sample / free)
     [x] Display previous scores (yes / no)
-    [ ] Rate only after finished listening (yes / no)
-    [ ] Change the rating afterwards (yes / no)
+    [x] Rate only after finished listening (yes / no)
+    [x] Rate only current sample (yes / no)
     [ ] Force to fill everything
-    [ ] Allow stop
+    [x] Allow stop playback
 
 [ ] Additional
     [ ] Double comparison samples
