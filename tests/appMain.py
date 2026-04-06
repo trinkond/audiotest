@@ -10,6 +10,7 @@ from ..structure.Question import Question
 from ..structure.Rating import RatingContinuous, RatingDiscrete
 from ..structure.Playlist import Playlist
 from ..structure.Test import Test
+from ..structure.Settings import Settings
 
 from ..logic.AppMain import AppMain
 
@@ -22,6 +23,7 @@ questions = [
     ]
 playlist = Playlist(samples, None, questions)
 test = Test([playlist])
+test.settings.requireFillAll = True
 
 app = AppMain(test)
 ret = app.run()

@@ -11,12 +11,12 @@ class Settings:
         "volume" : 50,
         "show sample names" : False,
         "shuffle samples" : False,
-        "listen in order" : True,
-        "allow replay" : False,
+        "listen in order" : False,
+        "allow replay" : True,
         "show ratings" : True,
-        "rate any" : False,
-        "rate after" : True,
-        "require fill all" : True,
+        "rate any" : True,
+        "rate after" : False,
+        "require fill all" : False,
         "allow stop" : True,
         "overwrite results" : False
     }

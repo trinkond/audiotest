@@ -23,8 +23,7 @@ What needs to be done
 [ ] Settings editor
 
 [ ] Fixes
-    [ ] Connect the Finish Test button
-    [ ] Add popup window, when the end_test isn't available and the save results doesn't work
+    [ ] Fix suspicious looking styles
 
 [ ] Features
     [x] Language settings
@@ -35,12 +34,12 @@ What needs to be done
     [x] Display previous scores (yes / no)
     [x] Rate only after finished listening (yes / no)
     [x] Rate only current sample (yes / no)
-    [ ] Force to fill everything
+    [x] Force to fill everything
     [x] Allow stop playback
 
 [ ] Additional
     [ ] Double comparison samples
     [ ] Shuffle comparison samples
-    [ ] Color themes
+    [x] Color themes
 
 

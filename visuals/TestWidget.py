@@ -12,12 +12,11 @@ from .SampleWidget import SampleWidget
 from .QuestionWidget import QuestionWidget
 from .ItemWidget import ItemWidget
 
-class EndButton(QPushButton):
-    def __init__(self, text : str = LanguageDefault.endTest, parent=None):
-        super().__init__(text=text, parent=parent)
-
 class TestWidget(QWidget):
     """  A widget to represent the whole test as a list of items (samples with questions) """
+
+    endTest = pyqtSignal()
+
     def __init__(self, test : Test, parent=None):
         super().__init__(parent)
 
@@ -43,7 +42,8 @@ class TestWidget(QWidget):
                 random.shuffle(items)
             self.itemWidgets.extend(items)
 
-        endButton = EndButton(language.endTest)
+        endButton = QPushButton(language.endTest)
+        endButton.clicked.connect(lambda checked=False: self.endTest.emit())
 
         layout = QVBoxLayout()
         layout.setSpacing(4)

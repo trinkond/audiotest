@@ -13,6 +13,7 @@ from ..structure.Question import Question
 from ..structure.Rating import RatingContinuous, RatingDiscrete
 from ..structure.Playlist import Playlist
 from ..structure.Test import Test
+from ..visuals.TestWidget import TestWidget
 from ..visuals.Window import Window
 
 app = QApplication(sys.argv)
@@ -27,7 +28,8 @@ playlist = Playlist(samples, None, questions)
 
 test = Test([playlist])
 
-window = Window(test)
+testWidget = TestWidget(test)
+window = Window(testWidget)
 window.setWindowTitle(test.title)
 
 player = Player(volume=0.5)

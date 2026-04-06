@@ -6,15 +6,16 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QLabel
 from PyQt6.QtCore import Qt, QSize
 from ..structure.Test import Test
 from .TestWidget import TestWidget
+from ..themes.themes import ThemeDefault
 
 class Window(QWidget):
     """ The main window of the test app allowing for scrolling """
 
-    def __init__(self, test : Test, parent=None):
+    def __init__(self, test : TestWidget, title="Audio test", theme=ThemeDefault, onClose=None, parent=None):
         super().__init__(parent)
 
-        self.test = test
-        self.testWidget = TestWidget(test)
+        self.testWidget = test
+        self.onClose = onClose
 
         self.scrollWidget = QScrollArea()
         self.scrollWidget.setWidget(self.testWidget)
@@ -29,15 +30,15 @@ class Window(QWidget):
         self.setLayout(layout)
         self.setMinimumWidth(self.minimumSizeHint().width())
 
-        self.setWindowTitle(test.title)
+        self.setWindowTitle(title)
 
         try:
-            with open(test.theme, "r") as f:
+            with open(theme, "r") as f:
                 self.setStyleSheet(f.read())
         except FileNotFoundError:
-            logger.error(f'Failed to load theme, file "{test.theme}" not found')
+            logger.error(f'Failed to load theme, file "{theme}" not found')
         except Exception as e:
-            logger.error(f'Failed to load theme from "{test.theme}", unexpected error: {e}')
+            logger.error(f'Failed to load theme from "{theme}", unexpected error: {e}')
 
     def marginWidth(self) -> int:
         margins = self.layout().contentsMargins()
@@ -60,3 +61,12 @@ class Window(QWidget):
         height = (3 * width) // 4
         height = max(height, super().sizeHint().height())
         return QSize(width, height)
+
+    def closeEvent(self, event):
+        """ Handle window close event """
+        if self.onClose:        # if on close function was provided
+            self.onClose()      # call it
+            event.ignore()      # ignore the close event
+        else:
+            event.accept()      # accept the close event and close the window
+            

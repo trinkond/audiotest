@@ -11,6 +11,7 @@ from ..structure.Question import Question
 from ..structure.Rating import RatingDiscrete, RatingContinuous, Rating
 from ..structure.Test import Test
 from ..visuals.Window import Window
+from ..visuals.TestWidget import TestWidget
 from ..themes.themes import ThemeList
 
 app = QApplication(sys.argv)
@@ -25,7 +26,8 @@ playlist = Playlist(samples, instructions, questions)
 
 test = Test([playlist], title="Window test", theme=ThemeList["big"])
 
-window = Window(test)
+testWidget = TestWidget(test)
+window = Window(testWidget)
 
 window.show()
 
