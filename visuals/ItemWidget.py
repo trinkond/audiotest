@@ -33,6 +33,20 @@ class ClickWatcher(QObject):
             if isinstance(child, QObject):
                 self.installRecursive(child)
 
+class LayoutWidget(QWidget):
+    """ A widget used just for layout purposes, doesn't draw itself and implements layout functionality """
+
+    def __init__(self, layout, parent=None):
+        super().__init__(parent)
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, False)     # let the widget be invisible
+        self.setLayout(layout)
+    
+    def addWidget(self, widget):
+        self.layout().addWidget(widget)
+
+    def setContentsMargins(self, left, top, right, bottom):
+        self.layout().setContentsMargins(left, top, right, bottom)
+
 class ItemWidget(QWidget):
     """ A widget representing an item containing a sample to be played and a list of questions to be filed """
     
@@ -44,7 +58,6 @@ class ItemWidget(QWidget):
         super().__init__(parent)
         self.id = id
         self.locked = locked
-
 
         self.instructWidget = QLabel(instructions) if instructions else None
         self.sampleWidget = SampleWidget(sample, contextId=id, name=sampleName)
@@ -64,22 +77,20 @@ class ItemWidget(QWidget):
             rating_layout.addWidget(score, 0, 2*i+1)
             self.rating_scores.append(score)
 
-        self.header = QWidget()
-        header_layout = QHBoxLayout(self.header)
-        header_layout.addWidget(self.sampleWidget)
+        self.header = LayoutWidget(QHBoxLayout())
+        self.header.addWidget(self.sampleWidget)
         if summary:
-            header_layout.addWidget(self.rating_summary)
+            self.header.addWidget(self.rating_summary)
         self.header.setMaximumHeight(60)
-        header_layout.setContentsMargins(0, 0, 0, 0)    # leave only main layout margins
+        self.header.setContentsMargins(0, 0, 0, 0)      # leave only main layout margins
 
-        self.body = QWidget()
-        body_layout = QVBoxLayout(self.body)
+        self.body = LayoutWidget(QVBoxLayout())
         if self.instructWidget:
-            body_layout.addWidget(self.instructWidget)
+            self.body.addWidget(self.instructWidget)
         for quest in self.questWidgets:
-            body_layout.addWidget(quest)
+            self.body.addWidget(quest)
             quest.ratingChanged.connect(self.ratingUpdate)
-        body_layout.setContentsMargins(0, 0, 0, 0)      # leave only main layout margins
+        self.body.setContentsMargins(0, 0, 0, 0)        # leave only main layout margins
 
         layout = QVBoxLayout()
         layout.setSpacing(0)                            # zero spacing between header and body

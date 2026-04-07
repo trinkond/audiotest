@@ -1,8 +1,8 @@
 # Written by Ondrej Trinkewitz
 # Contains the visual part for the Rating class
 
-from PyQt6.QtWidgets import QWidget, QStyle, QLabel, QSlider, QHBoxLayout, QLineEdit, QButtonGroup, QRadioButton, QStyleOptionSlider
-from PyQt6.QtGui import QPainter, QColor
+from PyQt6.QtWidgets import QWidget, QStyle, QLabel, QSlider, QHBoxLayout, QLineEdit, QButtonGroup, QRadioButton, QStyleOption, QStyleOptionSlider
+from PyQt6.QtGui import QPainter, QColor, QPalette
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 
 from ..structure.Rating import RatingDiscrete, RatingContinuous, Rating, Value
@@ -39,6 +39,8 @@ class LabeledSlider(Scale):
         
         assert maximum > minimum
         super().__init__(parent)
+        self.setObjectName("labeledSlider")
+        self.setStyleSheet("#labeledSlider { background: transparent; } #labeledSlider QSlider { background: transparent; }")
         self.minval = minimum
         self.maxval = maximum
         self.step = step
@@ -165,6 +167,11 @@ class LabeledSlider(Scale):
     def paintEvent(self, event):
         super().paintEvent(event)
         painter = QPainter(self)
+        # import the style options from the current theme
+        opt = QStyleOption()
+        opt.initFrom(self)
+
+        painter.setPen(opt.palette.color(QPalette.ColorRole.WindowText))
         fm = self.fontMetrics()                                 # for font sizes
         left, right, y = self._sliderPos()    
 
@@ -237,7 +244,7 @@ class RatingWidget(QWidget):
 
         self.valueField = QLineEdit()
         self.valueField.setReadOnly(not textEditable)
-        self.valueField.setFixedWidth(80)  # fixed width 80px
+        self.valueField.setFixedWidth(100)  # fixed width
 
         if type(self.rating) == RatingContinuous:
             self.scale = LabeledSlider(int(rating.minval), int(rating.maxval), step=1)

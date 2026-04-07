@@ -24,10 +24,10 @@ questions = [
     ]
 playlist = Playlist(samples, instructions, questions)
 
-test = Test([playlist], title="Window test", theme=ThemeList["big"])
+test = Test([playlist])
 
 testWidget = TestWidget(test)
-window = Window(testWidget)
+window = Window(testWidget, title="Window test", theme=ThemeList["big"])
 
 window.show()
 

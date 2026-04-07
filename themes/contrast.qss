@@ -1,18 +1,43 @@
 QWidget {
-    background-color: #ffffff;
     color: #000000;
     font-family: Arial;
     font-size: 13px;
     font-weight: 600;
 }
 
-QLabel {
-    color: #000000;
+Window, TestWidget, QScrollArea {
+    background-color: #ffffff;
 }
 
-QScrollArea {
+ItemWidget {
     border: 2px solid #000000;
     background-color: #ffffff;
+}
+
+QScrollBar:vertical {
+    background: #ffffff;
+    width: 14px;
+    margin: 0px;
+    border: 2px solid #000000;
+}
+
+QScrollBar::handle:vertical {
+    background: #ffff00;
+    min-height: 24px;
+    border: 2px solid #000000;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #e5e500;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: transparent;
+    height: 0px;
+    border: none;
 }
 
 QLineEdit {
@@ -21,10 +46,6 @@ QLineEdit {
     border: 2px solid #000000;
     border-radius: 0px;
     padding: 4px 6px;
-}
-
-QLineEdit:read-only {
-    background-color: #e6e6e6;
 }
 
 QPushButton {
@@ -49,6 +70,38 @@ QRadioButton {
     spacing: 8px;
 }
 
+QRadioButton::indicator {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #000000;
+    background: #ffffff;
+}
+
+QRadioButton::indicator:hover {
+    border: 2px solid #000000;
+    background: #fff5a3;
+}
+
+QRadioButton::indicator:checked {
+    border: 2px solid #000000;
+    background: #ffff00;
+}
+
+QRadioButton::indicator:checked:hover {
+    border: 2px solid #000000;
+    background: #e5e500;
+}
+
+QRadioButton::indicator:checked:disabled {
+    border: 2px solid #444444;
+    background: #c7c700;
+}
+
+QRadioButton::indicator:disabled {
+    border: 2px solid #444444;
+    background: #d9d9d9;
+}
+
 QRadioButton:disabled {
     color: #444444;
 }
@@ -67,21 +120,11 @@ QSlider::handle:horizontal {
     border-radius: 0px;
 }
 
+QSlider::handle:horizontal:hover {
+    background: #e5e500;
+}
+
 QSlider::handle:horizontal:disabled {
     background: #b3b3b3;
     border-color: #444444;
-}
-
-ItemWidget {
-    background-color: #ffffff;
-    border: 2px solid #000000;
-    border-radius: 0px;
-}
-
-QuestionWidget {
-    background-color: #ffffff;
-}
-
-RatingWidget {
-    background-color: transparent;
 }
