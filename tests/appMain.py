@@ -28,7 +28,5 @@ test.settings.requireFillAll = True
 app = AppMain(test)
 ret = app.run()
 
-if ret == 0:
-    app.saveResults("audiotest/tests/test_results.csv")
 sys.exit(ret)
 

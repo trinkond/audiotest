@@ -22,9 +22,6 @@ What needs to be done
     [x] Code the parsers & savers for all the objects
 [ ] Settings editor
 
-[ ] Fixes
-    [ ] Fix suspicious looking styles
-
 [ ] Features
     [x] Language settings
     [x] Playback volume

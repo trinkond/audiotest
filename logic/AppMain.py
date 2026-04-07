@@ -16,12 +16,13 @@ from PyQt6.QtCore import QObject
 
 class AppMain(QObject):
     """ The main logic of the application """
-    def __init__(self, test : Test, argv=[], parent=None):
+    def __init__(self, test : Test, resultFile : str = "results.csv", argv=[], parent=None):
         super().__init__(parent)
         
         self.test = test
         self.settings = test.settings
         self.language = test.language
+        self.resfile = resultFile
 
         self.app = QApplication(argv)
 
@@ -67,7 +68,7 @@ class AppMain(QObject):
             if reply != QMessageBox.StandardButton.Ok:
                 return
 
-        if self.saveResults("audiotest/tests/test_results.csv"):
+        if self.saveResults(self.resfile):
             self.app.exit(0)
         else:
             reply = QMessageBox.question(
@@ -78,4 +79,4 @@ class AppMain(QObject):
                 QMessageBox.StandardButton.Cancel
             )
             if reply == QMessageBox.StandardButton.Ok:
-                self.app.exit(0)
+                self.app.exit(100)
