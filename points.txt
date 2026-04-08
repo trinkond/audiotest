@@ -1,0 +1,20 @@
+Umí aplikace otevřít Reaper projekt samočinně?
+Okno otevřít ve full screen
+Udělat git instalovatelný
+
+Psaní, rozepsat si strukturu
+poslat v pondělí
+- Rešerše
+  - Normy, i prostředí
+- Plánování aplikace
+- Implementace
+- Výsledky
+  - testování v praxi
+  - feedback of uživatelů
+
+Core je to nastavení, jak sedí k těm normám
+Blokový diagram
+
+Účel textu:
+Čtenář by si měl představit, jak se to nasadí v praxi
+Návrh aplikace je podle norem, proto má tyhle parametry

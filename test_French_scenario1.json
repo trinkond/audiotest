@@ -1,0 +1,65 @@
+{
+    "version" : "0.1",
+    "title" : "Ukázkový test",
+    "volume" : 50,
+         
+    "language" : {
+        "sample" : "stopa",
+        "end test" : "ukončit test"
+    },
+
+    "regions" : {
+        "1": [0.0, 15.778],
+        "2": [20.0, 16.209],
+        "3": [40.0, 16.305],
+        "4": [60.0, 15.196],
+        "5": [79.0, 17.535],
+        "6": [100.0, 16.975],
+        "7": [120.0, 15.006],
+        "8": [138.0, 17.535],
+        "9": [158.0, 16.074]
+    },
+
+    "samples" : {
+        "1" : [2, 1],
+        "2" : [3, 2],
+        "3" : [4, 3],
+        "4" : [5, 4],
+        "5" : [6, 5],
+        "6" : [7, 6],
+        "7" : [8, 7],
+        "8" : [9, 8],
+        "9" : [10, 9]
+    },
+
+    "ratings" : {
+        "simple" : {
+            "type" : "discrete",
+            "1" : "Super",
+            "2" : "Dobré",
+            "3" : "Špatné"
+        }
+    },
+
+    "questions" : {
+        "default" : {
+            "text" : "Jak hodnotíte tento vzorek?",
+            "rating" : "simple"
+        }
+    },
+
+    "playlists" : [
+        {
+            "name" : "reference",
+            "samples" : ["1"],
+            "instructions" : "Toto je referenční vzorek, poslechněte si jej."
+        },
+
+        {
+            "name" : "test",
+            "samples" : ["2", "3", "4", "5", "6", "7", "8", "9"],
+            "questions" : ["default"],
+            "instructions" : null
+        }
+    ]
+}
