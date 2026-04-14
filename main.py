@@ -17,12 +17,6 @@ try:
 except IndexError:
     logger.error("No test file provided, exiting")
     sys.exit(1)
-try:
-    resultFile = sys.argv[2]
-    logger.info(f'Results will be saved to "{resultFile}"')
-except IndexError:
-    logger.warning(f"No result file provided, results will be saved to {RESULT_FILE}")
-    resultFile = RESULT_FILE
 
 test = loadTest(testFile)
 if test is None:
@@ -30,5 +24,5 @@ if test is None:
     sys.exit(101)
 logger.info("Test loaded successfully, running the application...")
 
-app = AppMain(test, resultFile, sys.argv)
+app = AppMain(test, sys.argv)
 sys.exit(app.run())

@@ -10,7 +10,9 @@ class Language:
         "fillall errtitle" : "#Not all ratings filled",
         "fillall errmessage" : "#All questions are required to be filled in the test. End it anyway?",
         "save errtitle" : "#Results saving failed",
-        "save errmessage" : "#An error occurred while saving the results. Exit without saving?"
+        "save errmessage" : "#An error occurred while saving the results. Exit without saving?",
+        "warning box title" : "#Warning",
+        "reaper error" : "#Failed to connect to the Reaper"
     }
 
     def __init__(self, lang : dict):
@@ -21,6 +23,8 @@ class Language:
         self.fillAllErrMessage = lang["fillall errmessage"]
         self.saveErrTitle = lang["save errtitle"]
         self.saveErrMessage = lang["save errmessage"]
+        self.warningBoxTitle = lang["warning box title"]
+        self.reaperError = lang["reaper error"]
 
     def toDict(self) -> dict:
         data = {}
@@ -30,6 +34,8 @@ class Language:
         data["fillall errmessage"] = self.fillAllErrMessage
         data["save errtitle"] = self.saveErrTitle
         data["save errmessage"] = self.saveErrMessage
+        data["warning box title"] = self.warningBoxTitle
+        data["reaper error"] = self.reaperError
         return data
 
 LanguageEN = Language({
@@ -38,7 +44,9 @@ LanguageEN = Language({
     "fillall errtitle" : "Ratings not filled",
     "fillall errmessage" : "All questions are required to be answered in the test. Are you sure you want to end it anyway?",
     "save errtitle" : "Results saving error",
-    "save errmessage" : "An error occurred while saving the results. Exit without saving?"
+    "save errmessage" : "An error occurred while saving the results. Exit without saving?",
+    "warning box title" : "Warning",
+    "reaper error" : "The connection to Reaper is lost, playback is not available."
 })
 
 LanguageCZ = Language({
@@ -47,7 +55,9 @@ LanguageCZ = Language({
     "fillall errtitle" : "Nevyplněné hodnocení",
     "fillall errmessage" : "Všechny otázky v testu musí být zodpovězeny. Opravdu chcete test ukončit nyní?",
     "save errtitle" : "Chyba uložení výsledků",
-    "save errmessage" : "Při ukládání výsledků došlo k chybě. Ukončit test bez uložení?"
+    "save errmessage" : "Při ukládání výsledků došlo k chybě. Ukončit test bez uložení?",
+    "warning box title" : "Chyba",
+    "reaper error" : "Nepodařilo se navázat spojení s programem Reaper, nelze přehrávat vzorky."
 })
 
 LanguageDefault = LanguageEN

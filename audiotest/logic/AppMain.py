@@ -12,33 +12,33 @@ from .RatingLockLogic import RatingLockLogic
 from .ResultCollector import ResultCollector
 
 from PyQt6.QtWidgets import QApplication, QMessageBox
-from PyQt6.QtCore import QObject
+from PyQt6.QtCore import QObject, QTimer
 
 class AppMain(QObject):
     """ The main logic of the application """
-    def __init__(self, test : Test, resultFile : str = "results.csv", argv=[], parent=None):
+    def __init__(self, test : Test, argv=[], parent=None):
         super().__init__(parent)
         
         self.test = test
         self.settings = test.settings
         self.language = test.language
-        self.resfile = resultFile
 
         self.app = QApplication(argv)
 
         self.testWidget = TestWidget(test)
-        self.testWidget.endTest.connect(self.endTest)
-        self.window = Window(self.testWidget, test.title, test.theme, onClose=self.endTest)
-        self.player = Player(volume=self.settings.volume / 100)
+        self.testWidget.endTest.connect(self.endTest)                                           # connect the End Test button signal
+        self.window = Window(self.testWidget, test.title, test.theme, onClose=self.endTest)     # connect the window close event too
+        self.player = Player(volume=self.settings.volume / 100, reaperPath=self.test.reaper, projectPath=self.test.project)
 
         self.playback = PlaybackControl(self.player, self.window, inOrder=self.settings.listenInOrder, allowRepeat=self.settings.allowReplay, allowStop=self.settings.allowStop)
         self.ratingLock = RatingLockLogic(self.playback, self.window, rateAny=self.settings.rateAny, rateAfter=self.settings.rateAfter)
         self.resultCollector = ResultCollector(self.test, self.test.title)
 
+        self.player.reaperError.connect(lambda: QMessageBox.warning(self.window, self.language.warningBoxTitle, self.language.reaperError))
+
     def run(self) -> int:
-        logger.info("Starting the player")
-        self.player.initReaper()
-        self.window.show()
+        self.window.showMaximized()
+        QTimer.singleShot(10, self.player.initReaper)  # Initialize Reaper when UI is ready
         logger.info("Running the application")
         ret = self.app.exec()
         if ret != 0:
@@ -47,7 +47,8 @@ class AppMain(QObject):
             logger.info(f"Application finished successfully with exit code {ret}")
         return ret
 
-    def saveResults(self, filename : str) -> bool:
+    def saveResults(self) -> bool:
+        filename = self.test.results
         logger.info(f"Saving results to {filename}")
         ret = self.resultCollector.saveResults(filename, overwrite=self.settings.overwriteResults)
         if ret:
@@ -68,7 +69,7 @@ class AppMain(QObject):
             if reply != QMessageBox.StandardButton.Ok:
                 return
 
-        if self.saveResults(self.resfile):
+        if self.saveResults():
             self.app.exit(0)
         else:
             reply = QMessageBox.question(

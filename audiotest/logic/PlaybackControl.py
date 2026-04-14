@@ -56,10 +56,8 @@ class PlaybackControl(QObject):
 
     def registerSamplesRecursive(self, obj : QObject):
         """ Connects all sample widgets in the object tree """
-        if isinstance(obj, SampleWidget):
-            self.registerSample(obj)
-        for child in obj.findChildren(QObject):
-            self.registerSamplesRecursive(child)
+        for sample in obj.findChildren(SampleWidget):
+            self.registerSample(sample)
 
     def playbackStart(self, sample : Sample, id : int):
         if self.player.playing():               # player busy

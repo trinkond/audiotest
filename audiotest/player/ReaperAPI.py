@@ -3,13 +3,22 @@
 
 import requests
 
-ADDRESS = "http://127.0.0.1:8080/_/"
-
 class ReaperError(Exception):
     pass
 
 class ReaperAPI:
     """ Class implementing communication with REAPER DAW over http """
+
+    ADDRESS = "http://127.0.0.1:8080/_/"
+
+    @staticmethod
+    def ping_server(address : str) -> bool:
+        """ Checks if the Reaper server is reachable at the given address """
+        try:
+            resp = requests.get(address)
+            return resp.ok
+        except Exception as e:
+            return False
 
     def __init__(self, address : str = ADDRESS):
         self.base_add = address

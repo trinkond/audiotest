@@ -184,10 +184,8 @@ class ResultCollector(QObject):
 
     def registerItemsRecursive(self, obj : QObject):
         """ Connect all ItemWidgets in the object tree """
-        if isinstance(obj, ItemWidget):
-            self.registerItem(obj)
-        for child in obj.findChildren(QObject):
-            self.registerItemsRecursive(child)
+        for item in obj.findChildren(ItemWidget):
+            self.registerItem(item)
 
     def ratingCollect(self, val : Value, source : tuple[int, int]):
         item, question, = source
@@ -203,10 +201,11 @@ class ResultCollector(QObject):
     def allFilled(self):
         return self.results.filled()
 
-    def saveResults(self, fname : str, overwrite : bool = False) -> bool:
+    def saveResults(self, fname : str = None, overwrite : bool = False) -> bool:
         """ Save the results into a csv file, with the header and timestamp
         if there is already a file with the given name, the new results will be appended """
-
+        if not fname:
+            fname = self.test.results
         if not self.allFilled():
             logger.warning("Saving results with unfilled ratings")
         if not fname.endswith('.csv'):

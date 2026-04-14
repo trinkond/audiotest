@@ -2,7 +2,10 @@
     "version" : "0.1",
     "title" : "Ukázkový test",
     "volume" : 50,
-         
+    "reaper" : "C:\\Program Files\\REAPER (x64)\\reaper.exe",
+    "project" : "../Sample_test_my_mess/Scenario_1.rpp",
+    "results" : "results.csv",
+
     "language" : {
         "sample" : "stopa",
         "end test" : "ukončit test"

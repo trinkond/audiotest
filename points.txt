@@ -1,6 +1,7 @@
 Umí aplikace otevřít Reaper projekt samočinně?
 Okno otevřít ve full screen
 Udělat git instalovatelný
+Škála neodpovídá standardu MUSHRA
 
 Psaní, rozepsat si strukturu
 poslat v pondělí

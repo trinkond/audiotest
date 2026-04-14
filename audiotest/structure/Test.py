@@ -15,10 +15,13 @@ from ..themes.themes import ThemeDefault
 
 class Test:
 
-    def __init__(self, playlists = [], settings = SettingsDefault, language = LanguageDefault, regions = {}, samples = {}, ratings = {}, questions = {}, version = "0.0", title = "Test", theme = ThemeDefault):
+    def __init__(self, playlists = [], settings = SettingsDefault, language = LanguageDefault, regions = {}, samples = {}, ratings = {}, questions = {}, version = "0.0", title = "Test", theme = ThemeDefault, reaper = "reaper", project = None, results = "results.csv"):
         self.version = version
         self.title = title
         self.theme = theme
+        self.reaper = reaper
+        self.project = project
+        self.results = results
         self.regions = regions
         self.samples = samples
         self.ratings = ratings
@@ -39,6 +42,9 @@ class Test:
     config_default = {
         "version" : "0.0",
         "title" : "Test",
+        "reaper" : "reaper",
+        "project" : None,
+        "results" : "results.csv",
         "theme" : ThemeDefault,
         "settings" : {},
         "language" : {},
@@ -73,14 +79,23 @@ class Test:
         version = config["version"]
         title = config["title"]
         theme = config["theme"]
+        reaper = config["reaper"]
+        project = config["project"]
+        if type(project) is not str and project is not None:
+            logger.error(f"Invalid project type, expected string or None, got {type(project)}. Project set to None.")
+            project = None
+        results = config["results"]
 
-        return Test(plays, setts, lang, regs, samples, rats, quests, version, title, theme)
+        return Test(plays, setts, lang, regs, samples, rats, quests, version, title, theme, reaper, project, results)
 
     def toDict(self) -> dict:
         data = {}
         data["version"] = self.version
         data["title"] = self.title
         data["theme"] = self.theme
+        data["reaper"] = self.reaper
+        data["project"] = self.project
+        data["results"] = self.results
         data["settings"] = self.settings.toDict()
         data["language"] = self.language.toDict()
         data["regions"] = saveRegions(self.regions)
