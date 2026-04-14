@@ -4,12 +4,11 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+import os
 import sys
 
 from audiotest.logic.AppMain import AppMain
 from audiotest.structure.Test import Test, loadTest
-
-RESULT_FILE = "results.csv"
 
 try:
     testFile = sys.argv[1]
@@ -19,10 +18,13 @@ except IndexError:
     sys.exit(1)
 
 test = loadTest(testFile)
+
 if test is None:
     logger.error("Failed to load the test, exiting...")
     sys.exit(101)
 logger.info("Test loaded successfully, running the application...")
 
-app = AppMain(test, sys.argv)
+testDir = os.path.dirname(testFile)
+
+app = AppMain(test, testDir, argv=sys.argv[2:])
 sys.exit(app.run())

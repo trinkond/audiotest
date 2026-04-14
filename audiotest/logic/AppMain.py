@@ -2,6 +2,8 @@
 import logging
 logger = logging.getLogger(__name__)
 
+import os
+
 from ..structure.Settings import Settings
 from ..structure.Test import Test
 from ..visuals.TestWidget import TestWidget
@@ -16,20 +18,26 @@ from PyQt6.QtCore import QObject, QTimer
 
 class AppMain(QObject):
     """ The main logic of the application """
-    def __init__(self, test : Test, argv=[], parent=None):
+    def __init__(self, test : Test, testDir : str, argv=[], parent=None):
         super().__init__(parent)
         
         self.test = test
         self.settings = test.settings
         self.language = test.language
+        self.testDir = testDir
+
+        reaperPath = self.test.reaper
+        if not os.path.isabs(reaperPath):
+            reaperPath = os.path.join(self.testDir, reaperPath)
+        projectPath = self.test.project
+        if not os.path.isabs(projectPath):
+            projectPath = os.path.join(self.testDir, projectPath)
 
         self.app = QApplication(argv)
-
         self.testWidget = TestWidget(test)
         self.testWidget.endTest.connect(self.endTest)                                           # connect the End Test button signal
         self.window = Window(self.testWidget, test.title, test.theme, onClose=self.endTest)     # connect the window close event too
-        self.player = Player(volume=self.settings.volume / 100, reaperPath=self.test.reaper, projectPath=self.test.project)
-
+        self.player = Player(volume=self.settings.volume / 100, reaperPath=reaperPath, projectPath=projectPath)
         self.playback = PlaybackControl(self.player, self.window, inOrder=self.settings.listenInOrder, allowRepeat=self.settings.allowReplay, allowStop=self.settings.allowStop)
         self.ratingLock = RatingLockLogic(self.playback, self.window, rateAny=self.settings.rateAny, rateAfter=self.settings.rateAfter)
         self.resultCollector = ResultCollector(self.test, self.test.title)
@@ -49,6 +57,8 @@ class AppMain(QObject):
 
     def saveResults(self) -> bool:
         filename = self.test.results
+        if not os.path.isabs(filename):
+            filename = os.path.join(self.testDir, filename)
         logger.info(f"Saving results to {filename}")
         ret = self.resultCollector.saveResults(filename, overwrite=self.settings.overwriteResults)
         if ret:
