@@ -24,7 +24,7 @@ class Window(QWidget):
         self.scrollWidget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
         layout = QVBoxLayout()
-        layout.addWidget(QLabel("My awesome testing app"))
+        layout.addWidget(QLabel(title))
         layout.addWidget(self.scrollWidget)
 
         self.setLayout(layout)

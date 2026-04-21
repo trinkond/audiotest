@@ -41,6 +41,8 @@ class AppMain(QObject):
         QTimer.singleShot(10, self.player.initReaper)  # Initialize Reaper when UI is ready
         logger.info("Running the application")
         ret = self.app.exec()
+        # Stop the playback, when the app quits
+        self.player.stop()
         if ret != 0:
             logger.error(f"Application finished with exit code {ret}")
         else:
