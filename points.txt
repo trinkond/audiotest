@@ -1,8 +1,14 @@
 DONE: Umí aplikace otevřít Reaper projekt samočinně?
 DONE: Okno otevřít ve full screen
 DONE: Zprovoznit shortcut pro daný test
-TODO: Udělat git instalovatelný
+TODO: Přidat změnitelnou adresu reaperu
+ASI: Udělat git instalovatelný - to be tested
 TODO: Škála neodpovídá standardu MUSHRA
+TODO: Možná je lepší použít STOP playback marker 1016 místo pause, protože vrátí kurzor na začátek samplu
+TODO: Možná by dávalo smysl udělat, že playback bez vzorků se zobrazí jako item jenom s otázkami ne jako nic.
+TODO: Přidat způsob, jak pojmenovat referenci. Třeba exclude from numbering flag v playlistu, ktery zobrazí id místo textu
+TODO: Přidat ukončnení přehrávání, když se aplikace vypne
+TODO: Přidat do okna titulek testu
 
 Psaní, rozepsat si strukturu
 poslat v pondělí

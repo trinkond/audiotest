@@ -9,7 +9,7 @@ class ReaperError(Exception):
 class ReaperAPI:
     """ Class implementing communication with REAPER DAW over http """
 
-    ADDRESS = "http://127.0.0.1:8080/_/"
+    ADDRESS = "http://127.0.0.1:8080"
 
     @staticmethod
     def ping_server(address : str) -> bool:
@@ -21,7 +21,7 @@ class ReaperAPI:
             return False
 
     def __init__(self, address : str = ADDRESS):
-        self.base_add = address
+        self.base_add = address + "/_/"
         self.check_server()
         self.n_tracks = self.get_n_tracks()
 
@@ -56,7 +56,6 @@ class ReaperAPI:
             raise ReaperError(f'Failed to send commands "{commands}", server not reached') from e
         if not resp.ok:
             raise ReaperError(f'Failed to send commands "{commands}", server responded with code {resp.status_code}')
-        return True
 
     """ Basic commands """
     Go_to_beginning = "SET/POS/0"

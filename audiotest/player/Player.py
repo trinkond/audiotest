@@ -71,7 +71,7 @@ class Player(QObject):
                 self.reaper.Stop,
                 self.reaper.Go_to_beginning,
                 self.reaper.Unmute_all,
-                self.reaper.Unsolo_all,
+                self.reaper.Unsolo_all
             )
         except ReaperError as e:
             logger.error(f"Reaper connection not working: {e}")
@@ -138,10 +138,12 @@ class Player(QObject):
             return False
         return self.timer.isActive()
 
-    def setVolume(self, volume : float):
+    def setVolume(self, volume : float) -> bool:
         try:
             SystemVolume.SetVolume(level=volume, mute=False)
             self.volume = volume
         except Exception as e:
             logger.warning(f"Failed to set system volume to {volume}: {e}")
+            return False
         logger.info(f"Set volume to {self.volume}")
+        return True

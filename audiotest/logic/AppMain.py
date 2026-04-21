@@ -32,11 +32,14 @@ class AppMain(QObject):
         projectPath = self.test.project
         if not os.path.isabs(projectPath):
             projectPath = os.path.join(self.testDir, projectPath)
+        themePath = self.test.theme
+        if not os.path.isabs(themePath):
+            themePath = os.path.join(self.testDir, themePath)
 
         self.app = QApplication(argv)
         self.testWidget = TestWidget(test)
         self.testWidget.endTest.connect(self.endTest)                                           # connect the End Test button signal
-        self.window = Window(self.testWidget, test.title, test.theme, onClose=self.endTest)     # connect the window close event too
+        self.window = Window(self.testWidget, test.title, themePath, onClose=self.endTest)     # connect the window close event too
         self.player = Player(volume=self.settings.volume / 100, reaperPath=reaperPath, projectPath=projectPath)
         self.playback = PlaybackControl(self.player, self.window, inOrder=self.settings.listenInOrder, allowRepeat=self.settings.allowReplay, allowStop=self.settings.allowStop)
         self.ratingLock = RatingLockLogic(self.playback, self.window, rateAny=self.settings.rateAny, rateAfter=self.settings.rateAfter)
