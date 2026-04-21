@@ -24,7 +24,5 @@ if test is None:
     sys.exit(101)
 logger.info("Test loaded successfully, running the application...")
 
-testDir = os.path.dirname(testFile)
-
-app = AppMain(test, testDir, argv=sys.argv[2:])
+app = AppMain(test, argv=sys.argv[2:])
 sys.exit(app.run())

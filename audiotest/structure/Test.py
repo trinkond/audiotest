@@ -3,6 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 import json
+import os
 
 from .Sample import parseRegions, parseSamples, saveRegions, saveSamples
 from .Rating import parseRatings, saveRatings
@@ -81,6 +82,7 @@ class Test:
         theme = config["theme"]
         reaper = config["reaper"]
         project = config["project"]
+
         if type(project) is not str and project is not None:
             logger.error(f"Invalid project type, expected string or None, got {type(project)}. Project set to None.")
             project = None
@@ -130,4 +132,17 @@ def loadTest(fname : str) -> Test:
         logger.error(f'Failed to load test configuration from "{fname}", unexpected error: {e}')
         return None
 
-    return Test.fromDict(data)
+    test = Test.fromDict(data)
+    testDir = os.path.dirname(fname)
+
+    # Make the paths absolute with respect to the fname loaded
+    if not os.path.isabs(test.reaper):
+        test.reaper = os.path.join(testDir, test.reaper)
+    if not os.path.isabs(test.project):
+        test.project = os.path.join(testDir, test.project)
+    if not os.path.isabs(test.theme):
+        test.theme = os.path.join(testDir, test.theme)
+    if not os.path.isabs(test.results):
+        test.results = os.path.join(testDir, test.results)
+
+    return test
