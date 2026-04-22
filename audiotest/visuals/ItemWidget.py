@@ -54,13 +54,13 @@ class ItemWidget(QWidget):
                            # value, ( itemID, questionID )
     ratingChanged = pyqtSignal(Value, tuple)            # emit the rating change to for result collection
 
-    def __init__(self, sample : Sample, instructions : str, questions : list[Question], sampleName=None, summary=True, id : int = 0, parent=None, expanded=False, locked=False):
+    def __init__(self, sample : Sample, instructions : str, questions : list[Question], name=None, summary=True, id : int = 0, parent=None, expanded=False, locked=False):
         super().__init__(parent)
         self.id = id
         self.locked = locked
 
         self.instructWidget = QLabel(instructions) if instructions else None
-        self.sampleWidget = SampleWidget(sample, contextId=id, name=sampleName)
+        self.sampleWidget = SampleWidget(sample, contextId=id, name=name) if sample else None
         self.questWidgets = []
         for i, quest in enumerate(questions):
             self.questWidgets.append(QuestionWidget(quest, i))
@@ -78,7 +78,12 @@ class ItemWidget(QWidget):
             self.rating_scores.append(score)
 
         self.header = LayoutWidget(QHBoxLayout())
-        self.header.addWidget(self.sampleWidget)
+        if self.sampleWidget:
+            self.header.addWidget(self.sampleWidget)
+        else:
+            label = QLabel(name if name else f'Item{" ID: " + str(sample.id) if sample.id else ""}')
+            label.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+            self.header.addWidget(label)
         if summary:
             self.header.addWidget(self.rating_summary)
         self.header.setMaximumHeight(60)

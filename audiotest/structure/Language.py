@@ -12,7 +12,8 @@ class Language:
         "save errtitle" : "#Results saving failed",
         "save errmessage" : "#An error occurred while saving the results. Exit without saving?",
         "warning box title" : "#Warning",
-        "reaper error" : "#Failed to connect to the Reaper"
+        "reaper error" : "#Failed to connect to the Reaper",
+        "note" : "#Note"
     }
 
     def __init__(self, lang : dict):
@@ -25,6 +26,7 @@ class Language:
         self.saveErrMessage = lang["save errmessage"]
         self.warningBoxTitle = lang["warning box title"]
         self.reaperError = lang["reaper error"]
+        self.note = lang["note"]
 
     def toDict(self) -> dict:
         data = {}
@@ -36,6 +38,7 @@ class Language:
         data["save errmessage"] = self.saveErrMessage
         data["warning box title"] = self.warningBoxTitle
         data["reaper error"] = self.reaperError
+        data["note"] = self.note
         return data
 
 LanguageEN = Language({
@@ -46,7 +49,8 @@ LanguageEN = Language({
     "save errtitle" : "Results saving error",
     "save errmessage" : "An error occurred while saving the results. Exit without saving?",
     "warning box title" : "Warning",
-    "reaper error" : "The connection to Reaper is lost, playback is not available."
+    "reaper error" : "The connection to Reaper is lost, playback is not available.",
+    "note" : "Note"
 })
 
 LanguageCZ = Language({
@@ -57,7 +61,8 @@ LanguageCZ = Language({
     "save errtitle" : "Chyba uložení výsledků",
     "save errmessage" : "Při ukládání výsledků došlo k chybě. Ukončit test bez uložení?",
     "warning box title" : "Chyba",
-    "reaper error" : "Nepodařilo se navázat spojení s programem Reaper, nelze přehrávat vzorky."
+    "reaper error" : "Nepodařilo se navázat spojení s programem Reaper, nelze přehrávat vzorky.",
+    "note" : "Poznámka"
 })
 
 LanguageDefault = LanguageEN
