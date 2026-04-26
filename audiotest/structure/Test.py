@@ -146,3 +146,25 @@ def loadTest(fname : str) -> Test:
         test.results = os.path.join(testDir, test.results)
 
     return test
+
+def saveTest(fname: str, test: Test) -> bool:
+
+    if not fname.endswith(".json"):
+        logger.warning(f'Saving test configuration as non-json file "{fname}"')
+    else:
+        logger.info(f'Saving test configuration as "{fname}"')
+
+    data = test.toDict()
+
+    try:
+        with open(fname, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+
+    except PermissionError:
+        logger.error(f'Permission denied while saving "{fname}"')
+        return False
+    except Exception as e:
+        logger.error(f'Failed to save test configuration to "{fname}": {e}')
+        return False
+
+    return True
