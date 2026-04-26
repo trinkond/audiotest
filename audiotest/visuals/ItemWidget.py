@@ -71,10 +71,8 @@ class ItemWidget(QWidget):
         self.rating_summary = QWidget()
         rating_layout = QGridLayout(self.rating_summary)
         for i, quest in enumerate(self.questWidgets):
-            label = QLabel(str(f"Question {i+1}:"))
             score = QLabel("")
-            rating_layout.addWidget(label, 0, 2*i)
-            rating_layout.addWidget(score, 0, 2*i+1)
+            rating_layout.addWidget(score, 0, i)
             self.rating_scores.append(score)
 
         self.header = LayoutWidget(QHBoxLayout())
