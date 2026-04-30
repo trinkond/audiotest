@@ -87,7 +87,17 @@ class Playlist:
         quests = oquests
         return Playlist(samps, instructs, quests, reorder, name)
 
-def parsePlaylists(data : list, samples : dict[str : Sample], questions : dict[str : Question]) -> list[Playlist]:
+    def toDict(self) -> dict:
+        data = {}
+        data["name"] = self.name
+        data["samples"] = [s.id for s in self.samples if s is not None]
+        if self.reorder:
+            data["reorder"] = True
+        data["instructions"] = self.instructions
+        data["questions"] = [q.id for q in self.questions if q is not None]
+        return data
+
+def parsePlaylists(data : list, samples : dict[str, Sample], questions : dict[str, Question]) -> list[Playlist]:
     """ parses a list loaded from json into a list of Playlists """
     logger.info("Parsing playlists")
     plays = []
@@ -97,7 +107,7 @@ def parsePlaylists(data : list, samples : dict[str : Sample], questions : dict[s
         if pl is not None:
             cc += 1
             plays.append(pl)
-    if plays == {}:
+    if plays == []:
         logger.warning("No playlists were parsed")
     else:
         logger.info(f"Successfully parsed {cc} playlists")
@@ -108,12 +118,6 @@ def savePlaylists(playlists : list[Playlist]) -> list:
     logger.info("Saving playlists")
     data = []
     for pl in playlists:
-        pl_dict = {}
-        pl_dict["name"] = pl.name
-        pl_dict["samples"] = [s.id for s in pl.samples]
-        if pl.reorder:
-            pl_dict["reorder"] = True
-        pl_dict["instructions"] = pl.instructions
-        pl_dict["questions"] = [q.id for q in pl.questions]
-        data.append(pl_dict)
+        if pl is not None:
+            data.append(pl.toDict())
     return data

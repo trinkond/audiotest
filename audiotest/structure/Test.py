@@ -5,10 +5,10 @@ logger = logging.getLogger(__name__)
 import json
 import os
 
-from .Sample import parseRegions, parseSamples, saveRegions, saveSamples
-from .Rating import parseRatings, saveRatings
-from .Question import parseQuestions, saveQuestions
-from .Playlist import parsePlaylists, savePlaylists
+from .Sample import Region, Sample
+from .Rating import Rating
+from .Question import Question
+from .Playlist import Playlist
 from .Settings import Settings, SettingsDefault
 from .Language import Language, LanguageDefault
 from .utils import loadDefault
@@ -63,20 +63,36 @@ class Test:
         # Load default values for missing entries and check object types
         config = loadDefault(data, Test.config_default)
 
-        regs = config["regions"]
-        regs = parseRegions(regs)
-        samples = config["samples"]
-        samples = parseSamples(samples, regs)
-        rats = config["ratings"]
-        rats = parseRatings(rats)
-        quests = config["questions"]
-        quests = parseQuestions(quests, rats)
-        plays = config["playlists"]
-        plays = parsePlaylists(plays, samples, quests)
-        setts = config["settings"]
-        setts = Settings(setts)
-        lang = config["language"]
-        lang = Language(lang)
+        regs = {}
+        for key, val in config["regions"].items():
+            try:
+                reg_id = int(key)
+            except (TypeError, ValueError):
+                logger.error(f'Unsupported region ID "{key}"')
+                continue
+            regs[reg_id] = Region.fromList(val, reg_id)
+
+        samples = {}
+        for key, val in config["samples"].items():
+            key = str(key)
+            samples[key] = Sample.fromList(val, regs, key)
+
+        ratings = {}
+        for key, val in config["ratings"].items():
+            key = str(key)
+            ratings[key] = Rating.fromDict(val, key)
+
+        questions = {}
+        for key, val in config["questions"].items():
+            key = str(key)
+            questions[key] = Question.fromDict(val, ratings, key)
+
+        playlists = []
+        for val in config["playlists"]:
+            playlists.append(Playlist.fromDict(val, samples, questions))
+
+        setts = Settings(config["settings"])
+        lang = Language(config["language"])
         version = config["version"]
         title = config["title"]
         theme = config["theme"]
@@ -88,7 +104,7 @@ class Test:
             project = None
         results = config["results"]
 
-        return Test(plays, setts, lang, regs, samples, rats, quests, version, title, theme, reaper, project, results)
+        return Test(playlists, setts, lang, regs, samples, ratings, questions, version, title, theme, reaper, project, results)
 
     def toDict(self) -> dict:
         data = {}
@@ -100,11 +116,20 @@ class Test:
         data["results"] = self.results
         data["settings"] = self.settings.toDict()
         data["language"] = self.language.toDict()
-        data["regions"] = saveRegions(self.regions)
-        data["samples"] = saveSamples(self.samples)
-        data["ratings"] = saveRatings(self.ratings)
-        data["questions"] = saveQuestions(self.questions)
-        data["playlists"] = savePlaylists(self.playlists)
+        data["regions"] = {}
+        for region in self.regions.values():
+            data["regions"][str(region.id)] = region.toList() if region is not None else None
+        data["samples"] = {}
+        for sample in self.samples.values():
+            data["samples"][str(sample.id)] = sample.toList() if sample is not None else None
+        data["ratings"] = {}
+        for rating in self.ratings.values():
+            data["ratings"][str(rating.id)] = rating.toDict() if rating is not None else None
+        data["questions"] = {}
+        for question in self.questions.values():
+            data["questions"][str(question.id)] = question.toDict() if question is not None else None
+        data["playlists"] = []
+        data["playlists"] = [pl.toDict() for pl in self.playlists]
         return data
 
 def loadTest(fname : str) -> Test:
@@ -134,6 +159,8 @@ def loadTest(fname : str) -> Test:
 
     test = Test.fromDict(data)
     testDir = os.path.dirname(fname)
+    if test is None:
+        return None
 
     # Make the paths absolute with respect to the fname loaded
     if not os.path.isabs(test.reaper):

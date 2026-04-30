@@ -5,11 +5,12 @@ TODO: Přidat změnitelnou adresu reaperu
 ASI: Udělat git instalovatelný - to be tested
 TODO: Škála neodpovídá standardu MUSHRA
 TODO: Možná je lepší použít STOP playback marker 1016 místo pause, protože vrátí kurzor na začátek samplu
-TODO: Možná by dávalo smysl udělat, že playback bez vzorků se zobrazí jako item jenom s otázkami ne jako nic.
+DONE: Možná by dávalo smysl udělat, že playback bez vzorků se zobrazí jako item jenom s otázkami ne jako nic.
 TODO: Přidat způsob, jak pojmenovat referenci. Třeba exclude from numbering flag v playlistu, ktery zobrazí id místo textu
 DONE: Přidat ukončnení přehrávání, když se aplikace vypne
 DONE: Přidat do okna titulek testu
 DONE: Přesunout absolutizaci cest do modulu Test tam, kde se načítá
+TODO: Možná dává větší smysl dát reaper a projekt cestu jako command line argument, ne do testu
 
 Psaní, rozepsat si strukturu
 poslat v pondělí

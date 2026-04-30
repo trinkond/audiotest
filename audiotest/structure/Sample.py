@@ -21,7 +21,7 @@ class Region:
     def __str__(self):
         return repr(self)
 
-    def toList(self):
+    def toList(self) -> list:
         """ returns the Region data as list for easier saving """
         return [self.start_time, self.duration]
 
@@ -48,6 +48,33 @@ class Sample:
 
     def __str__(self):
         return repr(self)
+
+    def toList(self) -> list:
+        """returns the Sample data in json-friendly format"""
+        try:
+            reg_id = self.region.id
+        except AttributeError:
+            reg_id = None
+            logger.warning(f"Sample {self.id} doesn't have a valid region")
+        return [self.track, reg_id]
+
+    @staticmethod
+    def fromList(data : list, regions : dict[int, Region], id : str = None):
+        """ constructs a Sample from json-compatible data and resolves region references """
+        try:
+            if type(data) != list or len(data) != 2:
+                raise TypeError()
+            track = int(data[0])
+            regid = int(data[1])
+        except (TypeError, ValueError, IndexError):
+            logger.error(f'Sample "{id}" is in incompatible format')
+            return None
+        try:
+            region = regions[regid]
+        except KeyError:
+            logger.warning(f'Region {regid} needed by sample "{id}" not found')
+            region = None
+        return Sample(track, region, id)
 
 def check_fname_csv(fname : str) -> bool:
     """ checks whether filename contains .csv """
@@ -200,23 +227,10 @@ def parseSamples(data : dict, regions: dict[int, Region]) -> dict[str, Sample]:
     cc = 0
     for id, dat in data.items():
         id = str(id)
-        try:
-            if type(dat) != list or len(dat) != 2:
-                raise TypeError()
-            track = int(dat[0])
-            regid = int(dat[1])
-        except (TypeError, ValueError, IndexError):
-            logger.error(f'Sample "{id}" is in incompatible format')
-            samples[id] = None
-            continue
-        try:
-            region = regions[regid]
+        sample = Sample.fromList(dat, regions, id)
+        if sample is not None:
             cc += 1
-        except KeyError:
-            logger.warning(f'Region {regid} needed by sample "{id}" not found')
-            region = None
-
-        samples[id] = Sample(track, region, id)
+        samples[id] = sample
 
     if samples == {}:
         logger.warning("No samples were parsed")
@@ -232,13 +246,8 @@ def saveSamples(samples : dict[str, Sample]) -> dict:
         if sample is None:
             data[str(id)] = None
             logger.warning(f"Sample {id} is None")
-            continue
-        try:
-            reg_id = sample.region.id
-        except AttributeError:
-            reg_id = None
-            logger.warning(f"Sample {id} doesn't have a valid region")
-        data[str(sample.id)] = [sample.track, reg_id]
+        else:
+            data[str(sample.id)] = sample.toList()
     return data
 
 

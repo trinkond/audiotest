@@ -15,6 +15,41 @@ class Rating:
     def __str__(self):
         return repr(self)
 
+    def toDict(self) -> dict:
+        """ returns the Rating data as dict for saving as json """
+        raise NotImplementedError("Subclasses must implement toDict()")
+
+    @staticmethod
+    def fromDict(data : dict, id : str = None):
+        """ constructs a Rating from dict format """
+        try:
+            rtype = str(data["type"])
+        except KeyError:
+            logger.error(f'Rating {str(id) + " " if id is not None else ""}cannot be parsed, missing "type" key')
+            return None
+
+        if rtype == RatingDiscrete.TYPE:
+            try:
+                values = data.copy()
+                values.pop("type")
+                return RatingDiscrete(values, id)
+            except (TypeError, ValueError, KeyError):
+                logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
+                return None
+
+        elif rtype == RatingContinuous.TYPE:
+            try:
+                minval = data["min"]
+                maxval = data["max"]
+                return RatingContinuous(minval, maxval, id)
+            except (KeyError, TypeError, ValueError):
+                logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
+                return None
+
+        else:
+            logger.error(f'Rating {str(id) + " " if id is not None else ""}is unknown type "{rtype}"')
+            return None
+
 class Value:
     """ Storing information about the value and the rating type """
     def __init__(self, rating : Rating, val : int):
@@ -51,6 +86,12 @@ class RatingDiscrete(Rating):
     def __str__(self):
         return repr(self)
 
+    def toDict(self) -> dict:
+        """ returns the RatingDiscrete data as dict for saving as json """
+        rat_dict = {str(k): v for k, v in self.scale}
+        rat_dict["type"] = self.TYPE
+        return rat_dict
+
 class RatingContinuous(Rating):
     
     def __init__(self, minval : int, maxval : int, id : str = None):
@@ -68,35 +109,13 @@ class RatingContinuous(Rating):
     def __str__(self):
         return repr(self)
 
-def parseRating(data : dict, id = None) -> Rating:
-    """ parses a rating from the data json format into Rating object, returns None if invalid """
-    try:
-        rtype = str(data["type"])
-    except KeyError:
-        logger.error(f'Rating {str(id) + " " if id is not None else ""}cannot be parsed, missing "type" key')
-        return None
-
-    if rtype == RatingDiscrete.TYPE:
-        try:
-            values = data.copy()
-            values.pop("type")
-            return RatingDiscrete(values, id)
-        except (TypeError, ValueError, KeyError):
-            logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
-            return None
-
-    elif rtype == RatingContinuous.TYPE:
-        try:
-            minval = data["min"]
-            maxval = data["max"]
-            return RatingContinuous(minval, maxval, id)
-        except (KeyError, TypeError, ValueError):
-            logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
-            return None
-
-    else:
-        logger.error(f'Rating {str(id) + " " if id is not None else ""}is unknown type "{rtype}"')
-        return None
+    def toDict(self) -> dict:
+        """ returns the RatingContinuous data as dict for saving as json """
+        rat_dict = {}
+        rat_dict["min"] = self.minval
+        rat_dict["max"] = self.maxval
+        rat_dict["type"] = self.TYPE
+        return rat_dict
 
 def parseRatings(data : dict) -> dict[str, Rating]:
     """ parses all ratings from json dict into Rating objects """
@@ -105,7 +124,7 @@ def parseRatings(data : dict) -> dict[str, Rating]:
     cc = 0
     for id, val in data.items():
         id = str(id)
-        rat = parseRating(val, id)
+        rat = Rating.fromDict(val, id)
         if rat is not None:
             cc += 1
         ratings[id] = rat
@@ -120,19 +139,14 @@ def saveRatings(ratings : dict[str, Rating]) -> dict:
     logger.info("Saving ratings")
     data = {}
     for id, rat in ratings.items():
-        if isinstance(rat, RatingContinuous):
-            rat_dict = {}
-            rat_dict["min"] = rat.minval
-            rat_dict["max"] = rat.maxval
-
-        elif isinstance(rat, RatingDiscrete):
-            rat_dict = {str(k): v for k, v in rat.scale}
-
-        else:
-            logger.warning(f'Rating type "{type(rat)}" cannot to be saved')
+        if rat is None:
+            logger.warning(f'Rating {id} is None')
             data[str(id)] = None
             continue
         
-        rat_dict["type"] = rat.__class__.TYPE
-        data[rat.id] = rat_dict
+        if isinstance(rat, (RatingContinuous, RatingDiscrete)):
+            data[rat.id] = rat.toDict()
+        else:
+            logger.warning(f'Rating type "{type(rat)}" cannot to be saved')
+            data[str(id)] = None
     return data
