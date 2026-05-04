@@ -71,6 +71,6 @@ class TestWidget(QWidget):
         self.setLayout(layout)
 
     def itemOpened(self, expandedItem):
-        for item in self.itemWidgets:
-            if item is not expandedItem:
+        for id, item in enumerate(self.itemWidgets):
+            if id != expandedItem:
                 item.setClosed()

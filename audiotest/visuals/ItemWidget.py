@@ -125,7 +125,7 @@ class ItemWidget(QWidget):
         """ Expands the item, if the header gets clicked """
         if not self.opened:
             self.setOpened()
-            self.expanded.emit(self)    # notify other widgetsabout the expansion
+            self.expanded.emit(self.id)    # notify other widgets about the expansion
 
     def lockRating(self):
         self.locked = True
