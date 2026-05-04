@@ -7,7 +7,7 @@ import os
 from PyQt6.QtCore import QObject, pyqtSignal
 from datetime import datetime
 
-from ..visuals.ItemWidget import ItemWidget
+from ..visuals.QuestionWidget import QuestionWidget
 from ..structure.Rating import Value
 from ..structure.Test import Test
 
@@ -170,22 +170,23 @@ class ResultCollector(QObject):
     """ Collects the ratings inputted by the user
     Connects to the signals of ItemWidget, that yields the rating, sorts and keeps it """
 
-    def __init__(self, test : Test, metadata : str = "Test", parent=None):
+    def __init__(self, test : Test, object : QObject, metadata : str = "Test", parent=None):
         super().__init__(parent)
         self.test = test
         self.metadata = metadata
         self.metadataItems = self.metadata.count(",") + 1 if self.metadata else 0
         self.structure = ResultStructure(test)
         self.results = Results(self.structure)
+        self.registerQuestionsRecursive(object)     # attach the result collection to the object
         logger.info(f"Initialized result collector with {self.results.items()} items and {self.results.size()} ratings.")
 
-    def registerItem(self, item : ItemWidget):
-        item.ratingChanged.connect(self.ratingCollect)
+    def registerQuestion(self, question : QuestionWidget):
+        question.ratingChanged.connect(self.ratingCollect)
 
-    def registerItemsRecursive(self, obj : QObject):
-        """ Connect all ItemWidgets in the object tree """
-        for item in obj.findChildren(ItemWidget):
-            self.registerItem(item)
+    def registerQuestionsRecursive(self, obj : QObject):
+        """ Connect all QuestionWidgets in the object tree """
+        for question in obj.findChildren(QuestionWidget):
+            self.registerQuestion(question)
 
     def ratingCollect(self, val : Value, source : tuple[int, int]):
         item, question, = source

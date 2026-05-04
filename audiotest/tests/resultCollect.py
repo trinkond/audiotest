@@ -42,14 +42,11 @@ quests = [
 playlist = Playlist(samples, "Listen to the sample and answer all the questions", quests, name="God playlist")
 test = Test([playlist])
 
-rescol = ResultCollector(test, metadata="Test,User")
-
 layout.addWidget(TestWidget(test))
 
 window.setLayout(layout)
 
-# connect all the sample signals to the result collector
-rescol.registerItemsRecursive(window)
+rescol = ResultCollector(test, window, metadata="Test,User")
 
 window.show()
 

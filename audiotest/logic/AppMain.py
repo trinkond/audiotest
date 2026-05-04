@@ -32,7 +32,7 @@ class AppMain(QObject):
         self.player = Player(volume=self.settings.volume / 100, reaperPath=test.reaper, projectPath=test.project)
         self.playback = PlaybackControl(self.player, self.window, inOrder=self.settings.listenInOrder, allowRepeat=self.settings.allowReplay, allowStop=self.settings.allowStop)
         self.ratingLock = RatingLockLogic(self.playback, self.window, rateAny=self.settings.rateAny, rateAfter=self.settings.rateAfter)
-        self.resultCollector = ResultCollector(self.test, self.test.title)
+        self.resultCollector = ResultCollector(self.test, self.window, self.test.title)
 
         self.player.reaperError.connect(lambda: QMessageBox.warning(self.window, self.language.warningBoxTitle, self.language.reaperError))
 

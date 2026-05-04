@@ -51,8 +51,6 @@ class ItemWidget(QWidget):
     """ A widget representing an item containing a sample to be played and a list of questions to be filed """
     
     expanded = pyqtSignal(object)                       # emits itself when clicked and expanded
-                           # value, ( itemID, questionID )
-    ratingChanged = pyqtSignal(Value, tuple)            # emit the rating change to for result collection
 
     def __init__(self, sample : Sample, instructions : str, questions : list[Question], name=None, summary=True, id : int = 0, parent=None, expanded=False, locked=False):
         super().__init__(parent)
@@ -63,7 +61,7 @@ class ItemWidget(QWidget):
         self.sampleWidget = SampleWidget(sample, contextId=id, name=name) if sample else None
         self.questWidgets = []
         for i, quest in enumerate(questions):
-            self.questWidgets.append(QuestionWidget(quest, i))
+            self.questWidgets.append(QuestionWidget(quest, i, id))
 
         self.opened = expanded      # track whether item is in expanded or summary view
         
@@ -139,7 +137,6 @@ class ItemWidget(QWidget):
         for quest in self.questWidgets:
             quest.unlockRating()
 
-    def ratingUpdate(self, val, quest):
-        self.ratingChanged.emit(val, (self.id, quest))     # emit the rating change higher
-        score = self.rating_scores[quest]
+    def ratingUpdate(self, val, source):
+        score = self.rating_scores[source[1]]
         score.setText(str(val))                            # update the label in the summary
