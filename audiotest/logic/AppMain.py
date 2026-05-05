@@ -37,9 +37,9 @@ class AppMain(QObject):
         self.player.reaperError.connect(lambda: QMessageBox.warning(self.window, self.language.warningBoxTitle, self.language.reaperError))
 
     def run(self) -> int:
-        self.window.showMaximized()
-        QTimer.singleShot(10, self.player.initReaper)  # Initialize Reaper when UI is ready
+        self.player.initReaper()
         logger.info("Running the application")
+        self.window.showMaximized()
         ret = self.app.exec()
         # Stop the playback, when the app quits
         self.player.stop()

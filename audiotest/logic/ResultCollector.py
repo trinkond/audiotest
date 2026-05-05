@@ -139,7 +139,7 @@ class Results:
 
         self.data[item][question] = val
 
-    def filled(self):
+    def filled(self) -> bool:
         """ Check if all ratings have been filled """
         for item in self.data:
             for rating in item:

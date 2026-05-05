@@ -25,21 +25,21 @@ window.setWindowTitle("Result collection test")
 layout = QVBoxLayout()
 
 samples = [
-    Sample(1, None, "My favorite song"),
-    Sample(2, None),
-    Sample(3, None)
+    Sample(1, None, "Sample 1"),
+    Sample(2, None, "Sample 2"),
+    Sample(3, None, "Sample 7")
 ]
 
 rat1 = RatingDiscrete({1 : "Bad", 2 : "Ok", 3 : "Good"})
 rat2 = RatingContinuous(1, 10)
 
 quests = [
-    Question("What was the quality?", rat2),
-    Question("How did you like the song?", rat1),
-    Question("Was the volume ok?", rat1)
+    Question("What was the quality?", rat2, "Quality qst"),
+    Question("How did you like the song?", rat1, "Opinion qst"),
+    Question("Was the volume ok?", rat1, "Question 3")
 ]
 
-playlist = Playlist(samples, "Listen to the sample and answer all the questions", quests, name="God playlist")
+playlist = Playlist(samples, "Listen to the sample and answer all the questions", quests, name="my Playlist")
 test = Test([playlist])
 
 layout.addWidget(TestWidget(test))

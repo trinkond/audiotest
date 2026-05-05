@@ -17,5 +17,6 @@ except IndexError:
 regions = read_config(regfile)      # Load the regions from the csv file
 regions = saveRegions(regions)      # Format the regions as a dict for saving to json
 
-with open(regfile.replace(".csv", ".json"), "w") as f:
+regfile = Path(regfile).with_suffix(".json")
+with open(regfile, "w") as f:
     json.dump(regions, f, indent=4)

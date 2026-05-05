@@ -101,5 +101,5 @@ class PlaybackControl(QObject):
     def lastPlayed(self) -> int:
         return self.lastPlayed
 
-    def isPlaying(self) -> int:
+    def isPlaying(self) -> bool:
         return self.player.playing()
