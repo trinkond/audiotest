@@ -139,12 +139,29 @@ class Results:
 
         self.data[item][question] = val
 
-    def filled(self) -> bool:
-        """ Check if all ratings have been filled """
+    def filled(self, item : int, quest : int) -> bool:
+        """ Check if a given question of a given item has been answered """
+        if item < 0 or item >= len(self.data):
+            raise IndexError(f"Item index {item} out of range")
+        if quest < 0 or quest >= len(self.data[item]):
+            raise IndexError(f"Question index {quest} out of range")
+        return self.data[item][quest] is not None
+
+    def itemFilled(self, item : int) -> bool:
+        """ Tests whether all the questions within an item are answered """
+        if item < 0 or item >= len(self.data):
+            raise IndexError(f"Item index {item} out of range")
+        item_data = self.data[item]
+        for quest in item_data:
+            if quest is None:
+                return False
+        return True
+
+    def allFilled(self) -> bool:
         for item in self.data:
-            for rating in item:
-                    if rating is None:
-                        return False
+            for quest in item:
+                if quest is None:
+                    return False
         return True
 
     def export(self) -> list[int]:
@@ -154,7 +171,7 @@ class Results:
             for val in item:
                 out.append(val.value if val is not None else VALUE_MISSING)
         return out
-        
+
     def size(self) -> int:
         """ Get the total number of ratings in the results """
         count = 0
@@ -199,8 +216,15 @@ class ResultCollector(QObject):
     def getResults(self):
         return self.results.export()
 
+    def itemFilled(self, item : int):
+        try:
+            return self.results.itemFilled(item)
+        except (TypeError, IndexError):
+            logger.error(f'Cannot check the rating of item "{item}", since this index is invalid')
+            return False
+
     def allFilled(self):
-        return self.results.filled()
+        return self.results.allFilled()
 
     def saveResults(self, fname : str = None, overwrite : bool = False) -> bool:
         """ Save the results into a csv file, with the header and timestamp

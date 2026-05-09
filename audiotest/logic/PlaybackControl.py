@@ -6,6 +6,7 @@ from PyQt6.QtCore import QObject, pyqtSignal
 from ..visuals.SampleWidget import SampleWidget
 from ..structure.Sample import Sample
 from ..player.Player import Player
+from .ResultCollector import ResultCollector
 
 class Checklist:
     def __init__(self):
@@ -34,14 +35,16 @@ class PlaybackControl(QObject):
     playbackBegin = pyqtSignal(int)     # item ID
     playbackEnd = pyqtSignal(int)       # item ID
 
-    def __init__(self, player : Player, object : QObject, inOrder = False, allowRepeat = True, allowStop = True, parent=None):
+    def __init__(self, player : Player, object : QObject, rescol : ResultCollector = None, inOrder = False, allowRepeat = True, allowStop = True, requirePrevFill = False, parent=None):
         super().__init__(parent)
         self.player = player
         self.object = object
+        self.rescol = rescol
         self.playingWidget = None
         self.inOrder = inOrder
         self.allowRepeat = allowRepeat
         self.allowStop = allowStop
+        self.requirePrevFill = requirePrevFill
 
         self.itemPlayed = Checklist()   # Holds if an item has been played for repeat checks
         self.lastPlayed = -1            # Holds the last played item for in order playback
@@ -69,6 +72,14 @@ class PlaybackControl(QObject):
         if self.inOrder and id not in [self.lastPlayed, self.lastPlayed + 1]:
             logger.info(f"Playback of item {id} requested, but only in order playback is allowed and previous item was {self.lastPlayed}, ignoring")
             return
+        if self.requirePrevFill:
+            if not self.rescol:
+                logger.warning(f"Require prevous sample filled, but no reference to the ResultCollector was provided")
+            else:
+                item = self.lastPlayed
+                if item >= 0 and not self.rescol.itemFilled(item):
+                    logger.info(f"Playback of item {id} requested, but previously listened item {item} was not rated yet")
+                    return
 
         if self.player.playSample(sample):      # start the playback
             self.playingWidget = self.sender()

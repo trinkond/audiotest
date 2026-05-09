@@ -22,8 +22,7 @@ questions = [
     Question("How much you like the sample?", RatingDiscrete({1: "Hate it", 2: "It's ok", 3: "Love it"})),
     ]
 playlist = Playlist(samples, None, questions)
-test = Test([playlist])
-test.settings.requireFillAll = True
+test = Test([playlist], Settings({"require fill previous" : True}))
 
 app = AppMain(test)
 ret = app.run()
