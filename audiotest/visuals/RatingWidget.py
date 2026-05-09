@@ -35,7 +35,7 @@ class LabeledSlider(Scale):
     """ Slider that supports float values and a custom step,
     renders with automatic labels underneath the slider """
     
-    def __init__(self, minimum, maximum, step, parent=None):
+    def __init__(self, minimum, maximum, step, labelStep = None, parent=None):
         
         assert maximum > minimum
         super().__init__(parent)
@@ -44,6 +44,7 @@ class LabeledSlider(Scale):
         self.minval = minimum
         self.maxval = maximum
         self.step = step
+        self.labelStep = labelStep  # if set, forces the exact step between the labels, otherwise this is computed dynamically
         self.n_steps = int(round((self.maxval - self.minval) / self.step))
         self.ticks = []                         # labeled ticks displayed on the slider
         self.SLIDER_OFFSET = self.fontMetrics().horizontalAdvance("88") # some offset to accommodate labels on the sides
@@ -123,14 +124,18 @@ class LabeledSlider(Scale):
 
     def _getTicks(self, max_steps=20):
         """ computes the parameters of labels displayed under the slider 
-        based on the current slider width. Displays muliples of 2/5/10 """
+        based on the current slider width. If labelStep is None, displays muliples of 2/5/10 """
         label_width = self._label_width() + self.LABEL_SPACING # add minimal spacing to the label size
 
-        val_range = self.maxval - self.minval
-        min_step = val_range * label_width / self._sliderWidth()    # minimal step size to accommodate the labels
-        min_step = max(min_step, val_range / max_steps)             # minimal step size to not exceed max_steps
+        if self.labelStep is None:
+            val_range = self.maxval - self.minval
+            min_step = val_range * label_width / self._sliderWidth()    # minimal step size to accommodate the labels
+            min_step = max(min_step, val_range / max_steps)             # minimal step size to not exceed max_steps
 
-        tick_step = self._niceRound(min_step / self.step)           # round the step to some nice multiple of slider step
+            tick_step = self._niceRound(min_step / self.step)           # round the step to some nice multiple of slider step
+        else:
+            tick_step = self.labelStep                              # if labelStep is specify, use it without change
+
         minvalstep = self.minval / self.step                        # is minval divisible by step? e.g. sequence contains 0?
         if math.isclose(minvalstep, round(minvalstep), abs_tol=1e-6):
             minvalstep = int(round(minvalstep))                     # number of steps corresponding to minval
@@ -148,11 +153,22 @@ class LabeledSlider(Scale):
 
     def sizeHint(self):
         height = self.SLIDER_HEIGHT + self.LABEL_OFFSET + self.fontMetrics().height()
-        return QSize(500, height)
+        if self.labelStep is None:
+            width = 500
+        else:
+            range = self.maxval - self.minval
+            ticks = math.floor(range / self.labelStep) + 1
+            width = ticks * self._label_width() + 2*self.SLIDER_OFFSET
+        return QSize(width, height)
 
     def minimumSizeHint(self):
         height = self.SLIDER_HEIGHT + self.LABEL_OFFSET + self.fontMetrics().height()
-        width = 100 + 2*self.SLIDER_OFFSET
+        if self.labelStep is None:
+            width = 100 + 2*self.SLIDER_OFFSET
+        else:
+            range = self.maxval - self.minval
+            ticks = math.floor(range / self.labelStep) + 1
+            width = ticks * self._label_width() + 2*self.SLIDER_OFFSET
         return QSize(width, height)
         
     def resizeEvent(self, event):
@@ -247,7 +263,7 @@ class RatingWidget(QWidget):
         self.valueField.setFixedWidth(100)  # fixed width
 
         if type(self.rating) == RatingContinuous:
-            self.scale = LabeledSlider(int(rating.minval), int(rating.maxval), step=1)
+            self.scale = LabeledSlider(int(rating.minval), int(rating.maxval), step=1, labelStep=rating.labelStep)
         elif type(self.rating) == RatingDiscrete:
             self.scale = ButtonRow(rating.scale)
         else:
@@ -255,6 +271,7 @@ class RatingWidget(QWidget):
 
         layout = QHBoxLayout()
         self.scale.setMaximumWidth(900)  # scale won't grow past 900px
+        self.scale.setMinimumWidth(rating.scaleSize)
         layout.addWidget(self.scale)
         layout.addWidget(self.valueField)
 

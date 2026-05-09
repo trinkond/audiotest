@@ -3,8 +3,9 @@ logger = logging.getLogger(__name__)
 
 class Rating:
     """ Abstract parent class for representing a rating scale """
-    def __init__(self, id : str = None):
+    def __init__(self, scaleSize = 0, id : str = None):
         self.id = id
+        self.scaleSize = scaleSize
 
     TYPE = None
 
@@ -32,19 +33,30 @@ class Rating:
             try:
                 values = data.copy()
                 values.pop("type")
-                return RatingDiscrete(values, id)
             except (TypeError, ValueError, KeyError):
                 logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
                 return None
+            return RatingDiscrete(values, id=id)
 
         elif rtype == RatingContinuous.TYPE:
             try:
                 minval = data["min"]
                 maxval = data["max"]
-                return RatingContinuous(minval, maxval, id)
             except (KeyError, TypeError, ValueError):
                 logger.error(f'Error parsing rating {str(id) if id is not None else ""}')
                 return None
+            if minval > maxval:
+                logger.error(f'Error parsing rating {str(id) if id is not None else ""}: min value {minval} is greater than max value {maxval}')
+                return None
+            try:
+                labelStep = data["label step"]
+            except KeyError:
+                labelStep = None
+            try:
+                self.scaleSize = data["scale size"]     # if scale size is specified, use it
+            except KeyError:
+                self.scaleSize = 0
+            return RatingContinuous(minval, maxval, labelStep, scaleSize, id=id)
 
         else:
             logger.error(f'Rating {str(id) + " " if id is not None else ""}is unknown type "{rtype}"')
@@ -73,7 +85,7 @@ class Value:
 class RatingDiscrete(Rating):
 
     def __init__(self, values : dict[int, str], id : str = None):
-        super().__init__(id)
+        super().__init__(id=id)
         self.scale = sorted((int(k), str(v)) for k, v in values.items())
     
     TYPE = "discrete"
@@ -94,9 +106,10 @@ class RatingDiscrete(Rating):
 
 class RatingContinuous(Rating):
     
-    def __init__(self, minval : int, maxval : int, id : str = None):
-        super().__init__(id)
+    def __init__(self, minval : int, maxval : int, labelStep : int = None, scaleSize : int = 0, id : str = None):
+        super().__init__(scaleSize, id=id)
         self.minval, self.maxval = int(minval), int(maxval)
+        self.labelStep = labelStep
         if self.minval > self.maxval:
             raise ValueError(f"min rating ({self.minval}) is greater than max ({self.maxval})")
 
@@ -115,6 +128,9 @@ class RatingContinuous(Rating):
         rat_dict["min"] = self.minval
         rat_dict["max"] = self.maxval
         rat_dict["type"] = self.TYPE
+        if self.labelStep is not None:
+            rat_dict["label step"] = self.labelStep
+        rat_dict["scale size"] = self.labelStep if self.labelStep is not None else 100
         return rat_dict
 
 def parseRatings(data : dict) -> dict[str, Rating]:

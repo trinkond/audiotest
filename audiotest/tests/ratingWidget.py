@@ -7,12 +7,12 @@ import sys
 
 """ Just a dummy widget to showcase the slider supporting float values """
 class SliderWidget(QWidget):
-    def __init__(self, minimum=0, maximum=100, step = 1):
+    def __init__(self, minimum=0, maximum=100, step = 1, labelStep=None):
         super().__init__()
 
         layout = QHBoxLayout()
 
-        slider = LabeledSlider(minimum, maximum, step)
+        slider = LabeledSlider(minimum, maximum, step, labelStep)
         slider.setMaximumWidth(900)  # slider won't grow past 300px
 
         value_field = QLineEdit()
@@ -46,7 +46,7 @@ layout = QVBoxLayout()
 
 # Showcase different slider configurations, including negative values and float values
 layout.addWidget(QLabel("Slider examples"))
-layout.addWidget(SliderWidget(0,100))
+layout.addWidget(SliderWidget(0,100, 1, 20))
 layout.addWidget(SliderWidget(0,1))
 layout.addWidget(SliderWidget(-3,54))
 layout.addWidget(SliderWidget(12,1000))

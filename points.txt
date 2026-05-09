@@ -11,7 +11,7 @@ DONE: Přidat ukončnení přehrávání, když se aplikace vypne
 DONE: Přidat do okna titulek testu
 DONE: Přesunout absolutizaci cest do modulu Test tam, kde se načítá
 TODO: Možná dává větší smysl dát reaper a projekt cestu jako command line argument, ne do testu
-SUS: In P800 test, it should not be possible to continue listening before the rating is filled
+DONE: In P800 test, it should not be possible to continue listening before the rating is filled
 
 Psaní, rozepsat si strukturu
 poslat v pondělí
@@ -29,3 +29,4 @@ Blokový diagram
 Účel textu:
 Čtenář by si měl představit, jak se to nasadí v praxi
 Návrh aplikace je podle norem, proto má tyhle parametry
+

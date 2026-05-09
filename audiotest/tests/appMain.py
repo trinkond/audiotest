@@ -18,7 +18,7 @@ from ..logic.AppMain import AppMain
 reg = Region(0.0, 15.778)
 samples = [Sample(2, reg), Sample(3, reg), Sample(4, reg)]
 questions = [
-    Question("What was the quality?", RatingContinuous(0, 100)),
+    Question("What was the quality?", RatingContinuous(0, 100, labelStep=20, scaleSize=300)),
     Question("How much you like the sample?", RatingDiscrete({1: "Hate it", 2: "It's ok", 3: "Love it"})),
     ]
 playlist = Playlist(samples, None, questions)
