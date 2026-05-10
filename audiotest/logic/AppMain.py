@@ -18,19 +18,20 @@ from PyQt6.QtCore import QObject, QTimer
 
 class AppMain(QObject):
     """ The main logic of the application """
-    def __init__(self, test : Test, argv=[], parent=None):
+    def __init__(self, test : Test, reaper = None, project = None, address = None, results = "results.csv", parent=None):
         super().__init__(parent)
         
         self.test = test
         self.settings = test.settings
         self.language = test.language
+        self.results = results
 
-        self.app = QApplication(argv)
+        self.app = QApplication([])
         self.testWidget = TestWidget(test)
         self.testWidget.endTest.connect(self.endTest)                                           # connect the End Test button signal
         self.window = Window(self.testWidget, test.title, test.theme, onClose=self.endTest)     # connect the window close event too
         self.resultCollector = ResultCollector(self.test, self.window, self.test.title)
-        self.player = Player(volume=self.settings.volume / 100, reaperPath=test.reaper, projectPath=test.project)
+        self.player = Player(volume=self.settings.volume / 100, reaperAddress=address, reaperPath=reaper, projectPath=project)
         self.playback = PlaybackControl(self.player, self.window, self.resultCollector, inOrder=self.settings.listenInOrder, allowRepeat=self.settings.allowReplay, allowStop=self.settings.allowStop, requirePrevFill=self.settings.requirePrevFill)
         self.ratingLock = RatingLockLogic(self.playback, self.window, rateAny=self.settings.rateAny, rateAfter=self.settings.rateAfter)
 
@@ -50,9 +51,8 @@ class AppMain(QObject):
         return ret
 
     def saveResults(self) -> bool:
-        filename = self.test.results
-        logger.info(f"Saving results to {filename}")
-        ret = self.resultCollector.saveResults(filename, overwrite=self.settings.overwriteResults)
+        logger.info(f"Saving results to {self.results}")
+        ret = self.resultCollector.saveResults(self.results, overwrite=self.settings.overwriteResults)
         if ret:
             logger.info("Results saved successfully")
         else:

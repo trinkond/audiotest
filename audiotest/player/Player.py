@@ -42,7 +42,7 @@ class Player(QObject):
         super().__init__(parent)
         self.track = 0
         self.region = None
-        self.reaperAddress = reaperAddress
+        self.reaperAddress = reaperAddress if reaperAddress else ReaperAPI.ADDRESS
         self.volume = volume
         self.reaper = None
         self.reaperPath = reaperPath

@@ -16,13 +16,10 @@ from ..themes.themes import ThemeDefault
 
 class Test:
 
-    def __init__(self, playlists = [], settings = SettingsDefault, language = LanguageDefault, regions = {}, samples = {}, ratings = {}, questions = {}, version = "0.0", title = "Test", theme = ThemeDefault, reaper = "reaper", project = None, results = "results.csv"):
+    def __init__(self, playlists = [], settings = SettingsDefault, language = LanguageDefault, regions = {}, samples = {}, ratings = {}, questions = {}, version = "0.0", title = "Test", theme = ThemeDefault):
         self.version = version
         self.title = title
         self.theme = theme
-        self.reaper = reaper
-        self.project = project
-        self.results = results
         self.regions = regions
         self.samples = samples
         self.ratings = ratings
@@ -43,9 +40,6 @@ class Test:
     config_default = {
         "version" : "0.0",
         "title" : "Test",
-        "reaper" : "reaper",
-        "project" : None,
-        "results" : "results.csv",
         "theme" : ThemeDefault,
         "settings" : {},
         "language" : {},
@@ -96,24 +90,14 @@ class Test:
         version = config["version"]
         title = config["title"]
         theme = config["theme"]
-        reaper = config["reaper"]
-        project = config["project"]
 
-        if type(project) is not str and project is not None:
-            logger.error(f"Invalid project type, expected string or None, got {type(project)}. Project set to None.")
-            project = None
-        results = config["results"]
-
-        return Test(playlists, setts, lang, regs, samples, ratings, questions, version, title, theme, reaper, project, results)
+        return Test(playlists, setts, lang, regs, samples, ratings, questions, version, title, theme)
 
     def toDict(self) -> dict:
         data = {}
         data["version"] = self.version
         data["title"] = self.title
         data["theme"] = self.theme
-        data["reaper"] = self.reaper
-        data["project"] = self.project
-        data["results"] = self.results
         data["settings"] = self.settings.toDict()
         data["language"] = self.language.toDict()
         data["regions"] = {}
@@ -158,19 +142,13 @@ def loadTest(fname : str) -> Test:
         return None
 
     test = Test.fromDict(data)
-    testDir = os.path.dirname(fname)
     if test is None:
         return None
 
+    testDir = os.path.dirname(fname)
     # Make the paths absolute with respect to the fname loaded
-    if not os.path.isabs(test.reaper):
-        test.reaper = os.path.join(testDir, test.reaper)
-    if not os.path.isabs(test.project):
-        test.project = os.path.join(testDir, test.project)
     if not os.path.isabs(test.theme):
         test.theme = os.path.join(testDir, test.theme)
-    if not os.path.isabs(test.results):
-        test.results = os.path.join(testDir, test.results)
 
     return test
 
