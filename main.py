@@ -16,7 +16,7 @@ parser.add_argument("config_file", help="JSON test configuration file")
 parser.add_argument("result_file", nargs="?", default="results.csv", help="CSV file path to save results")
 parser.add_argument("-r", "--reaper", dest="reaper", help="Path to the Reaper executable")
 parser.add_argument("-p", "--project", dest="project", help="Path to the Reaper project file")
-parser.add_argument("-a", "--address", dest="address", help="Address of the Reaper interface, usually http://127.0.0.1:8080")
+parser.add_argument("-a", "--address", dest="address", help="Address of the Reaper interface, normally 127.0.0.1:8080")
 
 args = parser.parse_args()
 
