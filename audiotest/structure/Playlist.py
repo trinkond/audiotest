@@ -10,11 +10,12 @@ class Playlist:
     """ Representation of a test playlist
     Each playlist contains multiple Samples and
     a set of instructions and questions that are asked for each of the samples """
-    def __init__(self, samples : list[Sample], instructions : str, questions : list[Question], reorder=False, name : str = None):
+    def __init__(self, samples : list[Sample], instructions : str, questions : list[Question], reorder=False, showNames = False, name : str = None):
         self.samples = samples
         self.instructions = instructions
         self.questions = questions
         self.reorder = reorder
+        self.showNames = showNames
         self.name = name
 
     def __repr__(self):
@@ -45,7 +46,13 @@ class Playlist:
         try:
             reorder = bool(data["reorder"])
         except (KeyError, TypeError, ValueError):
+            logger.info(f'Playlist "{name}" is missing the "reorder" key, using default value False')
             reorder = False
+        try:
+            showNames = bool(data["show names"])
+        except (KeyError, TypeError, ValueError):
+            logger.info(f'Playlist "{name}" is missing the "show names" key, using default value False')
+            showNames = False
         try:
             instructs = data["instructions"]
             if instructs is not None:
@@ -85,7 +92,7 @@ class Playlist:
                 q = None
             oquests.append(q)
         quests = oquests
-        return Playlist(samps, instructs, quests, reorder, name)
+        return Playlist(samps, instructs, quests, reorder, showNames, name)
 
     def toDict(self) -> dict:
         data = {}
@@ -93,6 +100,8 @@ class Playlist:
         data["samples"] = [s.id for s in self.samples if s is not None]
         if self.reorder:
             data["reorder"] = True
+        if self.showNames:
+            data["show names"] = True
         data["instructions"] = self.instructions
         data["questions"] = [q.id for q in self.questions if q is not None]
         return data

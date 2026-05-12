@@ -32,7 +32,7 @@ if test is None:
     sys.exit(101)
 
 # if the result or project paths are not absolute, make them relative to the test config file
-testDir = os.path.dirname(testFile)
+testDir = os.path.dirname(os.path.abspath(testFile))
 if not os.path.isabs(args.result_file):
     args.result_file = os.path.join(testDir, args.result_file)
 if args.project is not None and not os.path.isabs(args.project):
